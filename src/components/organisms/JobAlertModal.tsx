@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { createJobAlert } from "@/app/dashboard/alert-action";
+import { createJobAlert } from "@/app/(app)/dashboard/action";
 import { Input } from "../atoms/Input";
 import { Button } from "../atoms/Button";
 import { BellIcon } from "../atoms/icons/BellIcon";
 import { AuthAlert } from "../molecules/AuthAlert";
+import { useRouter } from "next/navigation";
 
 interface Props {
   onSuccess: (data: any) => void;
@@ -15,6 +16,7 @@ interface Props {
 export default function JobAlertModal({ onSuccess, onClose }: Props) {
   const [isOpen, setIsOpen] = useState(true);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const [status, setStatus] = useState<{ error?: string; message?: string }>(
     {},
@@ -30,17 +32,21 @@ export default function JobAlertModal({ onSuccess, onClose }: Props) {
       jobTitle: formData.get("jobTitle") as string,
       location: formData.get("location") as string,
       frequency: formData.get("frequency") as string,
-      minScore: Number(formData.get("minScore")),
+      minScore: Number(formData.get("minScore")) || 70,
     };
 
+    console.log("before create job alert", data);
+
     const result = await createJobAlert(data);
+
+    console.log("after create job alert", result);
     if (result.success) {
       setStatus({ message: "Kriteria tersimpan! Mencari lowongan..." });
-      setTimeout(() => {
-        onSuccess(data); // Beritahu dashboard untuk fetch jobs
-      }, 1500);
+      onSuccess(data); // Beritahu dashboard untuk fetch jobs
+      router.refresh();
     } else {
       setStatus({ error: result.error });
+      console.log("Error saving alert:", result.error);
       setLoading(false);
     }
   }

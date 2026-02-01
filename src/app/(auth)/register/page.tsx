@@ -36,26 +36,33 @@ export default function RegisterPage({
       <form action={signUp} className="space-y-5">
         <Input
           label="Full Name"
+          id="full_name"
           name="full_name"
           placeholder="Alex Rivera"
           required
         />
         <Input
           label="Email Address"
+          id="email"
           name="email"
           type="email"
           placeholder="alex@example.com"
+          autoComplete="email"
           required
         />
         <Input
           label="Password"
+          id="password"
           name="password"
           type="password"
           placeholder="••••••••"
+          autoComplete="new-password"
           required
         />
 
-        <Button type="submit">Create Account</Button>
+        <Button type="submit" className="w-full">
+          Create Account
+        </Button>
       </form>
 
       <p className="text-center text-sm text-slate-600">

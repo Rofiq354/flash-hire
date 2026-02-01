@@ -1,38 +1,27 @@
 "use client";
 
-import { createClient } from "@/utils/supabase/client";
+import { signInWithGoogle } from "@/features/auth/auth.oauth";
+import type { AuthMode } from "@/features/auth/auth.types";
 
 interface Props {
-  mode: "login" | "register";
+  mode: AuthMode;
 }
 
 export default function GoogleAuthButton({ mode }: Props) {
-  const supabase = createClient();
-
-  const handleGoogleAuth = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        // mode dikirim ke URL agar route.ts bisa baca
-        redirectTo: `${window.location.origin}/api/auth/callback?mode=${mode}`,
-        queryParams: {
-          prompt: "select_account",
-        },
-        // Mengirim metadata ke database
-        data: {
-          allow_signup: mode === "register" ? true : false,
-        },
-      } as any,
-    });
+  const handleClick = async () => {
+    try {
+      await signInWithGoogle(mode);
+    } catch (error) {
+      console.error("Google auth failed:", error);
+    }
   };
 
   return (
     <button
-      onClick={handleGoogleAuth}
+      onClick={handleClick}
       type="button"
       className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 active:scale-[0.98]"
     >
-      {/* SVG Logo Google yang lebih proper */}
       <svg className="h-5 w-5" viewBox="0 0 24 24">
         <path
           d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -51,6 +40,7 @@ export default function GoogleAuthButton({ mode }: Props) {
           fill="#EA4335"
         />
       </svg>
+
       <span>
         {mode === "login" ? "Login with Google" : "Register with Google"}
       </span>

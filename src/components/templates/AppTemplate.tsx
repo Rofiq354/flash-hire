@@ -1,8 +1,8 @@
 // src/components/templates/DashboardTemplate.tsx
-import { Sidebar } from "@/components/organisms/Sidebar";
+import { Sidebar } from "@/components/organisms/Sidebar/Sidebar";
 import { Navbar } from "@/components/organisms/Navbar";
 
-export const DashboardTemplate = ({
+export const ApplicationTemplate = ({
   children,
 }: {
   children: React.ReactNode;
