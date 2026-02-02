@@ -20,7 +20,7 @@ export default function UploadClient() {
 
       if (result.success) {
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/job-matches");
         }, 100);
       }
     } catch (error) {

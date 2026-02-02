@@ -3,6 +3,7 @@ import { SearchBar } from "@/components/molecules/SearchBar";
 import { UserBadge } from "@/components/molecules/UserBadge";
 import { Button } from "@/components/atoms/Button";
 import { UploadCloud } from "lucide-react";
+import Link from "next/link";
 
 export const Navbar = () => {
   return (
@@ -22,7 +23,9 @@ export const Navbar = () => {
           <span className="whitespace-nowrap">Quick Upload CV</span>
         </Button>
 
-        <UserBadge name="Alex Rivera" role="Frontend Dev" />
+        <Link href="/profile" prefetch={false}>
+          <UserBadge name="Alex Rivera" role="Frontend Dev" />
+        </Link>
       </div>
     </header>
   );

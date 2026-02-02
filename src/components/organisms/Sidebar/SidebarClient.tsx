@@ -19,7 +19,7 @@ interface SidebarClientProps {
 const mainMenus = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
   { name: "My CV", icon: FileText, href: "/my-cv" },
-  { name: "Job Matches", icon: Handshake, href: "/dashboard/matches" },
+  { name: "Job Matches", icon: Handshake, href: "/job-matches" },
   { name: "Job Alerts", icon: Bell, href: "/dashboard/alerts" },
 ];
 
