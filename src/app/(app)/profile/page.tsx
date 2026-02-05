@@ -2,12 +2,25 @@
 import React from "react";
 import ProfileClient from "./profileClient";
 import { Globe } from "lucide-react";
+import { getCurrentUser } from "@/services/auth/user.service";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
-export default function ProfileSettingsPage() {
+export default async function ProfileSettingsPage() {
+  const userData = await getCurrentUser();
+
+  if (!userData) {
+    redirect("/login");
+  }
+
+  const userCvs = await prisma.cvs.findMany({
+    where: { user_id: userData.id },
+    orderBy: { created_at: "desc" },
+  });
+
   return (
     <div className="min-h-screen bg-background font-sans">
       <div className="mx-auto px-4 sm:px-6">
-        {/* Static Header / Breadcrumbs */}
         <nav className="mx-auto mb-8 flex items-center gap-2 text-sm text-muted">
           <Globe size={16} />
           <span>Dashboard</span>
@@ -18,7 +31,7 @@ export default function ProfileSettingsPage() {
         </nav>
 
         {/* Interactivity starts here */}
-        <ProfileClient />
+        <ProfileClient user={userData} initialCvs={userCvs} />
 
         {/* Static Footer */}
         <footer className="mx-auto mt-16 border-t border-border-custom pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted">

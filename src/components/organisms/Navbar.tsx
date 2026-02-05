@@ -4,16 +4,21 @@ import { UserBadge } from "@/components/molecules/UserBadge";
 import { Button } from "@/components/atoms/Button";
 import { UploadCloud } from "lucide-react";
 import Link from "next/link";
+import { getCurrentUser } from "@/services/auth/user.service";
 
-export const Navbar = () => {
+export const Navbar = async () => {
+  const userData = await getCurrentUser();
+
+  const userName =
+    userData?.profile?.full_name || userData?.email?.split("@")[0] || "User";
+  const userRole = userData?.profile?.job_title || "Professional";
+  const userAvatar = userData?.profile?.avatar_url;
   return (
     <header className="h-20 border-b border-border-custom bg-white dark:bg-slate-950 px-8 flex items-center justify-between sticky top-0 z-50">
-      {/* Search Bar */}
       <div className="flex-1 pr-8">
         <SearchBar />
       </div>
 
-      {/* Right Actions */}
       <div className="flex items-center gap-6 shrink-0">
         <Button
           variant="primary"
@@ -24,7 +29,7 @@ export const Navbar = () => {
         </Button>
 
         <Link href="/profile" prefetch={false}>
-          <UserBadge name="Alex Rivera" role="Frontend Dev" />
+          <UserBadge name={userName} role={userRole} avatar={userAvatar} />
         </Link>
       </div>
     </header>

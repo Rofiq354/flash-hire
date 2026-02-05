@@ -4,10 +4,10 @@ import { Avatar } from "@/components/atoms/Avatar";
 interface UserBadgeProps {
   name: string;
   role: string;
+  avatar?: string;
 }
 
-export const UserBadge = ({ name, role }: UserBadgeProps) => (
-  // Tambahkan h-full agar divider vertikalnya terlihat bagus sejajar navbar
+export const UserBadge = ({ name, role, avatar }: UserBadgeProps) => (
   <div className="flex items-center gap-4 pl-6 border-l border-slate-200 dark:border-slate-800 h-10">
     <div className="flex flex-col items-end whitespace-nowrap">
       <span className="text-sm font-bold text-slate-900 dark:text-white leading-none">
@@ -17,6 +17,6 @@ export const UserBadge = ({ name, role }: UserBadgeProps) => (
         {role}
       </span>
     </div>
-    <Avatar src="https://i.pravatar.cc/150?u=alex" />
+    <Avatar src={avatar} />
   </div>
 );

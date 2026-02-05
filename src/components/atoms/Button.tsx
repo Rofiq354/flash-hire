@@ -5,14 +5,16 @@ import React, { useState } from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "outline" | "ghost" | "secondary";
+  size?: "sm" | "md" | "lg" | "icon";
   isLoading?: boolean;
-  showLoadingOnClick?: boolean; // Tambahin ini buat auto-spinner pas navigasi
+  showLoadingOnClick?: boolean;
 }
 
 interface LinkButtonProps {
   href: string;
   children: React.ReactNode;
   variant?: "primary" | "outline" | "ghost" | "secondary";
+  size?: "sm" | "md" | "lg" | "icon";
   className?: string;
   showLoadingOnClick?: boolean;
   onClick?: () => void;
@@ -21,6 +23,7 @@ interface LinkButtonProps {
 export const Button = ({
   children,
   variant = "primary",
+  size = "md",
   isLoading: externalLoading,
   showLoadingOnClick = false,
   className = "",
@@ -50,9 +53,16 @@ export const Button = ({
       "bg-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-100",
   };
 
+  const sizes = {
+    sm: "px-3 py-1.5 text-xs rounded-lg",
+    md: "px-4 py-2.5 text-sm rounded-xl",
+    lg: "px-6 py-3.5 text-base rounded-2xl",
+    icon: "p-2 rounded-full",
+  };
+
   return (
     <button
-      className={`${baseStyles} ${variants[variant]} ${className}`}
+      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
       disabled={isLoading || props.disabled}
       onClick={handlePress}
       {...props}

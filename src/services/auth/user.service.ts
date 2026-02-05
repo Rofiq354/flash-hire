@@ -10,7 +10,7 @@ export async function getCurrentUser() {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    return null; // atau throw redirect("/login")
+    return null;
   }
 
   // Ambil profile
@@ -19,8 +19,6 @@ export async function getCurrentUser() {
     .select("*")
     .eq("id", user.id)
     .maybeSingle();
-
-  // console.log(profile);
 
   if (profileError) {
     console.error("Error fetching profile:", profileError.message);
