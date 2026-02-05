@@ -2,8 +2,6 @@
 
 import { useState, useMemo } from "react";
 import { DashboardContent } from "@/components/organisms/dashboard/DashboardContent";
-import JobAlertModal from "@/components/organisms/JobAlertModal";
-import { calculateMatchScore } from "@/lib/jobs/matchScore";
 
 interface Props {
   initialUser: any;
@@ -19,24 +17,23 @@ export default function DashboardClient({
   fetchedJobs,
 }: Props) {
   const [alertData, setAlertData] = useState(initialAlert);
-  const [showModal, setShowModal] = useState(false);
+  const [jobs, setJobs] = useState(fetchedJobs);
+  const [isSyncing, setIsSyncing] = useState(false);
 
-  const jobs = fetchedJobs;
-
-  // Contoh: hitung matchScore untuk semua job, cuma dihitung saat cv.skills atau fetchedJobs berubah
-  // const jobsWithScore = useMemo(() => {
-  //   if (!initialCv?.skills) return fetchedJobs;
-
-  //   return fetchedJobs.map((job) => ({
-  //     ...job,
-  //     matchScore: calculateMatchScore(
-  //       initialCv.skills,
-  //       `${job.title} ${job.description}`,
-  //     ),
-  //   }));
-  // }, [initialCv?.skills, fetchedJobs]);
-
-  // console.log(initialCv);
+  const refreshJobs = async (newKeyword: string, newLocation: string) => {
+    setIsSyncing(true);
+    try {
+      const res = await fetch(
+        `/api/jobs/search?keyword=${newKeyword}&location=${newLocation}&userId=${initialUser?.id}`,
+      );
+      const data = await res.json();
+      if (data.success) {
+        setJobs(data.jobs);
+      }
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -48,24 +45,16 @@ export default function DashboardClient({
         Here’s a quick overview of your CV analysis and top job matches.
       </p>
 
-      {/* Modal Job Alert */}
-      {showModal && (
-        <JobAlertModal
-          onSuccess={(data) => {
-            setAlertData(data);
-            setShowModal(false);
-          }}
-          onClose={() => setShowModal(false)}
-        />
-      )}
-
       {/* Dashboard Content */}
       <DashboardContent
-        user={initialUser}
         cvData={initialCv}
         userId={initialUser?.id}
-        jobs={jobs} // pakai matchScore
+        userEmail={initialUser?.email}
+        jobs={jobs}
         alertData={alertData}
+        setAlertData={setAlertData}
+        onAlertChange={refreshJobs}
+        isSyncing={isSyncing}
       />
     </div>
   );

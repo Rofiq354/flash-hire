@@ -9,11 +9,6 @@ import { getCurrentUser } from "@/services/auth/user.service";
 export default async function DashboardPage() {
   const userProfile = await getCurrentUser();
 
-  // Ambil data job alert
-  const alertData = await prisma.job_alerts.findFirst({
-    where: { user_id: userProfile?.id },
-  });
-
   const supabase = createClient();
   const {
     data: { user },
@@ -21,12 +16,16 @@ export default async function DashboardPage() {
 
   const userId = user?.id;
 
-  // Cari CV user
-  const userCv = await prisma.cvs.findUnique({
-    where: { user_id: userProfile?.id },
+  if (!userId) redirect("/login");
+
+  const alertData = await prisma.job_alerts.findFirst({
+    where: { user_id: userId },
   });
 
-  // Kalau belum ada CV, redirect ke upload page
+  const userCv = await prisma.cvs.findUnique({
+    where: { user_id: userId },
+  });
+
   if (!userCv) {
     redirect("/my-cv");
   }
@@ -36,15 +35,17 @@ export default async function DashboardPage() {
     userProfile?.profile?.job_title ||
     "Software Engineer";
 
-  const jobs = await fetchAdzunaJobs(
+  const finalLocation = alertData?.location || "";
+
+  const jobsData = await fetchAdzunaJobs(
     {
       keyword: finalKeyword,
-      location: (alertData?.location as string) || "",
+      location: finalLocation,
       page: 1,
       resultsPerPage: 2,
       maxDays: 14,
     },
-    userId, // <--- TAMBAHKAN INI DI SINI
+    userId,
   );
 
   return (
@@ -54,7 +55,7 @@ export default async function DashboardPage() {
           initialUser={user}
           initialCv={userCv}
           initialAlert={alertData}
-          fetchedJobs={jobs.jobs}
+          fetchedJobs={jobsData.jobs || []}
         />
 
         {/* Static Footer */}

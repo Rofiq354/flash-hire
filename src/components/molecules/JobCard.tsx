@@ -9,7 +9,7 @@ import { SaveJobButton } from "../atoms/SaveJobButton";
 import { AnalysisModal } from "./AnalysisModal";
 
 interface JobCardProps {
-  job: NormalizedJob & { matchScore?: number }; // ✅ Add matchScore
+  job: NormalizedJob & { matchScore?: number };
   cvData?: any;
   userId?: string;
 }
@@ -21,7 +21,6 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
 
   const cleanTitle = job.title?.replace(/<\/?[^>]+(>|$)/g, "") || "Position";
 
-  // ✅ Use matchScore from props (calculated in JobClient)
   const matchScore = job.matchScore ?? null;
 
   // Penentuan warna badge berdasarkan score
@@ -41,14 +40,13 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
       setIsAnalyzing(true);
       setShowModal(true);
 
-      // ✅ Call skill gap analysis API
       const response = await fetch("/api/analysis/skill-gap", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           jobDescription: job.description,
           userCV: cvData.parsed_data,
-          jobId: job.id, // ✅ For caching
+          jobId: job.id,
         }),
       });
 
@@ -111,7 +109,6 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
           </div>
         </div>
 
-        {/* Quick Match Summary - Always visible */}
         {matchScore !== null && (
           <div className="mt-5 bg-slate-50 border border-slate-100 rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
@@ -129,7 +126,6 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
               </span>
             </div>
 
-            {/* Show detailed analysis if available */}
             {analysisResult ? (
               <div className="space-y-1.5">
                 <p className="text-sm font-medium text-slate-800">

@@ -1,10 +1,7 @@
 // app/api/analysis/skill-gap/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@/utils/supabase/server";
 import { callGeminiWithRetry } from "@/lib/gemini-helper";
-
-// const genai = new GoogleGenAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: NextRequest) {
   try {
@@ -51,26 +48,10 @@ export async function POST(req: NextRequest) {
     const optimizedCV = extractEssentialCVData(userCV);
     const optimizedJobDesc = truncateText(jobDescription, 1500);
 
-    // Build efficient prompt
     const prompt = buildEfficientPrompt(optimizedJobDesc, optimizedCV);
 
     console.log("🤖 Calling Gemini API for skill gap analysis...");
 
-    // Call Gemini with optimized settings
-    // const model = genai.getGenerativeModel({
-    //   model: "gemini-2.0-flash-exp",
-    // });
-
-    // const result = await model.generateContent({
-    //   contents: [{ role: "user", parts: [{ text: prompt }] }],
-    //   generationConfig: {
-    //     temperature: 0.3,
-    //     maxOutputTokens: 2000,
-    //     responseMimeType: "application/json",
-    //   },
-    // });
-
-    // const response = result.response;
     const text = await callGeminiWithRetry(prompt);
 
     if (!text) {
@@ -132,52 +113,52 @@ function truncateText(text: string, maxLength: number): string {
 function buildEfficientPrompt(jobDescription: string, userCV: any): string {
   return `Analyze job-candidate match. Return ONLY valid JSON.
 
-JOB DESCRIPTION:
-${jobDescription}
+    JOB DESCRIPTION:
+    ${jobDescription}
 
-CANDIDATE:
-Skills: ${userCV.skills.technical.join(", ")}
-Tools: ${userCV.skills.tools.join(", ")}
-Experience: ${userCV.experience.map((e: any) => `${e.title || e} (${e.duration || ""})`).join("; ")}
-Education: ${userCV.education.map((e: any) => e.degree || e).join(", ")}
+    CANDIDATE:
+    Skills: ${userCV.skills.technical.join(", ")}
+    Tools: ${userCV.skills.tools.join(", ")}
+    Experience: ${userCV.experience.map((e: any) => `${e.title || e} (${e.duration || ""})`).join("; ")}
+    Education: ${userCV.education.map((e: any) => e.degree || e).join(", ")}
 
-Return JSON with this EXACT structure:
-{
-  "overall_score": <number 0-100>,
-  "category_scores": {
-    "technical_skills": <number 0-100>,
-    "experience": <number 0-100>,
-    "education": <number 0-100>,
-    "soft_skills": <number 0-100>
-  },
-  "matching_skills": {
-    "hard_skills": [<max 10 strings>],
-    "soft_skills": [<max 5 strings>],
-    "tools": [<max 8 strings>]
-  },
-  "missing_skills": {
-    "critical": [<max 5 strings - must-have skills>],
-    "important": [<max 5 strings - preferred skills>],
-    "nice_to_have": [<max 3 strings - bonus skills>]
-  },
-  "recommendations": {
-    "immediate_actions": [<max 3 strings>],
-    "short_term_learning": [<max 3 strings>],
-    "long_term_development": [<max 2 strings>]
-  },
-  "strengths": [<max 3 strings>],
-  "weaknesses": [<max 3 strings>],
-  "overall_advice": "<1-2 sentences>",
-  "estimated_time_to_ready": "<e.g., '2-3 months' or 'Ready now'>"
-}
+    Return JSON with this EXACT structure:
+    {
+      "overall_score": <number 0-100>,
+      "category_scores": {
+        "technical_skills": <number 0-100>,
+        "experience": <number 0-100>,
+        "education": <number 0-100>,
+        "soft_skills": <number 0-100>
+      },
+      "matching_skills": {
+        "hard_skills": [<max 10 strings>],
+        "soft_skills": [<max 5 strings>],
+        "tools": [<max 8 strings>]
+      },
+      "missing_skills": {
+        "critical": [<max 5 strings - must-have skills>],
+        "important": [<max 5 strings - preferred skills>],
+        "nice_to_have": [<max 3 strings - bonus skills>]
+      },
+      "recommendations": {
+        "immediate_actions": [<max 3 strings>],
+        "short_term_learning": [<max 3 strings>],
+        "long_term_development": [<max 2 strings>]
+      },
+      "strengths": [<max 3 strings>],
+      "weaknesses": [<max 3 strings>],
+      "overall_advice": "<1-2 sentences>",
+      "estimated_time_to_ready": "<e.g., '2-3 months' or 'Ready now'>"
+    }
 
-SCORING RULES:
-- Technical skills: 40% weight
-- Experience: 30% weight
-- Education: 15% weight
-- Soft skills: 15% weight
-- Be honest but constructive
-- Focus on concrete skills, not generic advice`;
+    SCORING RULES:
+    - Technical skills: 40% weight
+    - Experience: 30% weight
+    - Education: 15% weight
+    - Soft skills: 15% weight
+    - Be honest but constructive
+    - Focus on concrete skills, not generic advice`;
 }
 
 // ============================================================================
@@ -189,7 +170,6 @@ async function getCachedAnalysis(
   jobId: string,
 ): Promise<any | null> {
   try {
-    const { createClient } = await import("@/utils/supabase/server");
     const supabase = createClient();
 
     const { data, error } = await supabase
@@ -220,7 +200,6 @@ async function getCachedAnalysis(
 
 async function saveAnalysisCache(userId: string, jobId: string, analysis: any) {
   try {
-    const { createClient } = await import("@/utils/supabase/server");
     const supabase = createClient();
 
     // First, get existing job_data
@@ -245,7 +224,6 @@ async function saveAnalysisCache(userId: string, jobId: string, analysis: any) {
         .eq("user_id", userId)
         .eq("job_id", jobId);
     }
-    // If not saved, we don't store the analysis (only store for saved jobs)
   } catch (error) {
     console.error("Cache save error:", error);
   }

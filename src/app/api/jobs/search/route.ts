@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     // Cache all jobs in background (don't await)
     if (result.jobs && result.jobs.length > 0) {
-      cacheJobsBatch(result.jobs).catch((err) =>
+      cacheJobsBatch(result.jobs as []).catch((err) =>
         console.error("Cache failed:", err),
       );
     }
@@ -54,5 +54,33 @@ export async function POST(req: NextRequest) {
       },
       { status: 500 },
     );
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const keyword = searchParams.get("keyword") || "Software Engineer";
+    const location = searchParams.get("location") || "";
+    const userId = searchParams.get("userId");
+
+    const jobsData = await fetchAdzunaJobs(
+      {
+        keyword,
+        location,
+        page: 1,
+        resultsPerPage: 2,
+        maxDays: 14,
+      },
+      userId || undefined,
+    );
+
+    return NextResponse.json({
+      success: true,
+      jobs: jobsData?.jobs || [],
+    });
+  } catch (error: any) {
+    console.error("Search API Error:", error);
+    return NextResponse.json({ success: false, jobs: [] }, { status: 500 });
   }
 }
