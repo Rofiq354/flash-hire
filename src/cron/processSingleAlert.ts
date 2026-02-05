@@ -1,6 +1,6 @@
 // src/cron/processSingleAlert.ts
 import { prisma } from "@/lib/prisma";
-import { fetchAdzunaJobs } from "@/services/adzuna.service";
+import { fetchAdzunaJobs } from "@/services/jobs/adzuna.service";
 import { normalizeAdzunaJob } from "@/lib/jobs/normalizeAzunaJob";
 import { evaluateJobMatch } from "@/services/jobMatch.service";
 

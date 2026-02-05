@@ -4,11 +4,13 @@ import { JobCard } from "@/components/molecules/JobCard";
 interface MiddleDashboardColumnProps {
   jobs: any[];
   cvData: any;
+  userId?: string;
 }
 
 export const MiddleDashboardColumn = ({
   jobs,
   cvData,
+  userId,
 }: MiddleDashboardColumnProps) => {
   return (
     <div className="col-span-12 xl:col-span-5 lg:col-span-6">
@@ -28,7 +30,9 @@ export const MiddleDashboardColumn = ({
 
       <div className="space-y-4">
         {jobs.length > 0 ? (
-          jobs.map((job) => <JobCard key={job.id} job={job} cvData={cvData} />)
+          jobs.map((job) => (
+            <JobCard key={job.id} job={job} cvData={cvData} userId={userId} />
+          ))
         ) : (
           <div className="text-center py-10 bg-white rounded-3xl border border-dashed border-slate-200">
             <p className="text-slate-400 text-sm">

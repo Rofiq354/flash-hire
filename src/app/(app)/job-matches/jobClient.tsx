@@ -5,27 +5,30 @@ import { Button } from "@/components/atoms/Button";
 import { JobCard } from "@/components/molecules/JobCard";
 import { ChevronLeft, Search, Bell, ChevronDown } from "lucide-react";
 import { calculateMatchScore } from "@/lib/jobs/matchScore";
+import SearchComponent from "@/components/molecules/job-matches/SearchComponent";
 
 export default function JobClient({
   initialJobs,
   initialCv,
+  userId,
 }: {
   initialJobs: any[];
   initialCv: any;
+  userId?: string;
 }) {
-  // const jobs = initialJobs;
+  const jobs = initialJobs;
 
-  const jobsWithScore = useMemo(() => {
-    if (!initialCv?.skills) return initialJobs;
+  // const jobsWithScore = useMemo(() => {
+  //   if (!initialCv?.skills) return initialJobs;
 
-    return initialJobs.map((job) => ({
-      ...job,
-      matchScore: calculateMatchScore(
-        initialCv.skills,
-        `${job.title} ${job.description}`,
-      ),
-    }));
-  }, [initialCv?.skills, initialJobs]);
+  //   return initialJobs.map((job) => ({
+  //     ...job,
+  //     matchScore: calculateMatchScore(
+  //       initialCv.skills,
+  //       `${job.title} ${job.description}`,
+  //     ),
+  //   }));
+  // }, [initialCv?.skills, initialJobs]);
 
   return (
     <div className="space-y-8">
@@ -45,12 +48,7 @@ export default function JobClient({
             </p>
           </div>
         </div>
-        <Button
-          variant="outline"
-          className="h-11 px-5 text-sm gap-2 rounded-xl"
-        >
-          <Search className="h-4 w-4" /> Refine Search
-        </Button>
+        <SearchComponent />
       </div>
 
       {/* Alert Banner (Compact) */}
@@ -76,8 +74,8 @@ export default function JobClient({
 
       {/* Job Grid - 3 Columns on Large Screens */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {jobsWithScore.map((job) => (
-          <JobCard key={job.id} job={job} cvData={initialCv} />
+        {jobs.map((job) => (
+          <JobCard key={job.id} job={job} userId={userId} cvData={initialCv} />
         ))}
       </div>
 

@@ -7,7 +7,6 @@ import { GoogleGenAI } from "@google/genai";
 export async function uploadAndAnalyzeCV(formData: FormData) {
   const supabase = createClient();
 
-  // 1️⃣ AUTH (pasti kebaca)
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -16,13 +15,11 @@ export async function uploadAndAnalyzeCV(formData: FormData) {
     throw new Error("Unauthorized");
   }
 
-  // 2️⃣ FILE VALIDATION
   const file = formData.get("cv") as File | null;
   if (!file) {
     throw new Error("No CV file provided");
   }
 
-  // 3️⃣ UPLOAD KE SUPABASE STORAGE
   const ext = file.name.split(".").pop();
   const fileName = `${user.id}-${Date.now()}.${ext}`;
   const filePath = `resume/${fileName}`;
@@ -39,7 +36,6 @@ export async function uploadAndAnalyzeCV(formData: FormData) {
     data: { publicUrl },
   } = supabase.storage.from("cv-files").getPublicUrl(filePath);
 
-  // 4️⃣ GEMINI ANALYSIS
   const genai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY!,
   });
@@ -117,7 +113,7 @@ export async function uploadAndAnalyzeCV(formData: FormData) {
   `;
 
   const response = await genai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-2.5-flash-lite",
     contents: [
       {
         role: "user",
@@ -141,7 +137,6 @@ export async function uploadAndAnalyzeCV(formData: FormData) {
 
   const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
 
-  // 5️⃣ DATABASE SYNC
   await prisma.cvs.upsert({
     where: { user_id: user.id },
     update: {

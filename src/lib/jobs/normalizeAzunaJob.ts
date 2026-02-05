@@ -18,6 +18,7 @@ export interface NormalizedJob {
   postedDate: Date;
   url: string;
   source: "adzuna";
+  matchScore?: number;
 }
 
 export function normalizeAdzunaJob(job: any): NormalizedJob {

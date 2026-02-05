@@ -30,6 +30,47 @@ export async function signUp(formData: FormData) {
 
   console.log("Registrasi Berhasil!");
 
+  return redirect("/register/onboarding");
+}
+
+export async function completeOnboarding(formData: FormData) {
+  const supabase = createClient();
+
+  // 1. Ambil user ID dari sesi yang aktif
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return redirect("/login");
+  }
+
+  // 2. Ambil data dari form
+  const job_title = formData.get("job_title") as string;
+  const country = formData.get("country") as string;
+  const location = formData.get("location") as string;
+  const phone_number = formData.get("phone_number") as string;
+
+  // 3. Update tabel profiles di schema public
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      job_title,
+      country,
+      location,
+      phone_number,
+    })
+    .eq("id", user.id); // Pastikan ID sama dengan ID user yang login
+
+  if (error) {
+    console.error("Gagal update profil:", error.message);
+    return redirect(
+      `/register/onboarding?error=${encodeURIComponent(error.message)}`,
+    );
+  }
+
+  // 4. Selesai! Arahkan ke dashboard
   return redirect("/dashboard");
 }
 

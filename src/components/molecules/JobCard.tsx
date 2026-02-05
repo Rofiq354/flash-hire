@@ -1,87 +1,96 @@
+// components/molecules/JobCard.tsx
 "use client";
 
 import { useState } from "react";
-import { Button } from "../atoms/Button";
-import { AnalysisModal } from "./AnalysisModal";
-import { getJobAnalysis } from "@/app/(app)/actions/job-actions";
+import { Button, LinkButton } from "../atoms/Button";
 import { NormalizedJob } from "@/lib/jobs/normalizeAzunaJob";
-import { Bookmark, MapPin, Briefcase, CheckCircle2 } from "lucide-react";
-
-interface AnalysisResult {
-  score: number;
-  match_reasons: string[];
-  missing_skills: string[];
-  advice: string;
-}
+import { MapPin, Briefcase, Target } from "lucide-react";
+import { SaveJobButton } from "../atoms/SaveJobButton";
+import { AnalysisModal } from "./AnalysisModal";
 
 interface JobCardProps {
-  job: NormalizedJob;
+  job: NormalizedJob & { matchScore?: number }; // ✅ Add matchScore
   cvData?: any;
+  userId?: string;
 }
 
-export const JobCard = ({ job, cvData }: JobCardProps) => {
+export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
-    null,
-  );
+  const [analysisResult, setAnalysisResult] = useState<any | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   const cleanTitle = job.title?.replace(/<\/?[^>]+(>|$)/g, "") || "Position";
 
+  // ✅ Use matchScore from props (calculated in JobClient)
+  const matchScore = job.matchScore ?? null;
+
   // Penentuan warna badge berdasarkan score
   const getScoreStyles = (score: number) => {
-    if (score >= 80) return "bg-emerald-50 text-emerald-600";
-    if (score >= 60) return "bg-amber-50 text-amber-600";
-    return "bg-red-50 text-red-600";
+    if (score >= 75) return "bg-emerald-50 text-emerald-600 border-emerald-100";
+    if (score >= 50) return "bg-amber-50 text-amber-600 border-amber-100";
+    return "bg-red-50 text-red-600 border-red-100";
   };
 
   const handleAnalyze = async () => {
+    if (!cvData || !userId) {
+      alert("Please login and upload your CV first");
+      return;
+    }
+
     try {
       setIsAnalyzing(true);
       setShowModal(true);
-      const result = await getJobAnalysis(job.description, cvData);
-      setAnalysisResult(result);
+
+      // ✅ Call skill gap analysis API
+      const response = await fetch("/api/analysis/skill-gap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jobDescription: job.description,
+          userCV: cvData.parsed_data,
+          jobId: job.id, // ✅ For caching
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setAnalysisResult(result.data);
+      } else {
+        throw new Error(result.error);
+      }
     } catch (error) {
-      console.error("Job analysis failed:", error);
+      console.error("Analysis failed:", error);
       setAnalysisResult({
-        score: 0,
-        match_reasons: ["Analysis failed"],
-        missing_skills: [],
-        advice: "Unable to analyze this job at the moment.",
+        overall_score: 0,
+        strengths: ["Analysis failed"],
+        weaknesses: [],
+        overall_advice: "Unable to analyze this job at the moment.",
       });
     } finally {
       setIsAnalyzing(false);
     }
   };
 
-  const score = analysisResult?.score ?? null;
-
   return (
     <div className="bg-card border border-border-custom rounded-4xl p-6 hover:shadow-lg transition-all relative group h-full flex flex-col justify-between">
       <div>
-        {/* Top Section: Badges & Save */}
+        {/* Top Section: Match Score Badge & Save */}
         <div className="flex justify-between items-start mb-4">
           <div className="flex gap-2">
-            {score !== null && (
+            {matchScore !== null && (
               <span
-                className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getScoreStyles(score)}`}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${getScoreStyles(matchScore)}`}
               >
-                {score}% Match Score
+                <Target className="inline h-3 w-3 mr-1" />
+                {matchScore}% Match
               </span>
             )}
             <span className="px-3 py-1 bg-slate-100 text-muted text-[10px] font-bold rounded-full uppercase tracking-wider">
               {job.contractType || "Full-time"}
             </span>
           </div>
-          <button
-            onClick={() => setIsSaved(!isSaved)}
-            className="text-slate-400 hover:text-primary transition-colors focus:outline-none"
-          >
-            <Bookmark
-              className={`h-5 w-5 ${isSaved ? "fill-primary text-primary" : ""}`}
-            />
-          </button>
+          <SaveJobButton job={job} userId={userId} variant="minimal" />
         </div>
 
         {/* Content Section */}
@@ -102,52 +111,73 @@ export const JobCard = ({ job, cvData }: JobCardProps) => {
           </div>
         </div>
 
-        {/* AI Analysis Box - Hanya muncul jika sudah di-analyze */}
-        {analysisResult ? (
-          <div className="mt-5 bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-start gap-3">
-            <CheckCircle2 className="h-5 w-5 text-emerald-500 mt-0.5" />
-            <div className="space-y-1">
-              <p className="text-sm font-bold text-slate-800">
-                {analysisResult.match_reasons[0] ||
-                  "Matching with your profile"}
+        {/* Quick Match Summary - Always visible */}
+        {matchScore !== null && (
+          <div className="mt-5 bg-slate-50 border border-slate-100 rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+                Quick Match
               </p>
-              <p className="text-xs text-muted leading-relaxed">
-                Missing:{" "}
-                <span className="text-primary font-medium">
-                  {analysisResult.missing_skills.join(", ") || "None"}
-                </span>
-              </p>
+              <span
+                className={`text-xs font-bold ${matchScore >= 75 ? "text-emerald-600" : matchScore >= 50 ? "text-amber-600" : "text-red-600"}`}
+              >
+                {matchScore >= 75
+                  ? "Strong"
+                  : matchScore >= 50
+                    ? "Moderate"
+                    : "Weak"}
+              </span>
             </div>
-          </div>
-        ) : (
-          /* Placeholder Box jika belum analyze agar layout tetap rapi */
-          <div className="mt-5 bg-indigo-50/30 border border-dashed border-indigo-100 rounded-2xl p-4 flex items-center justify-center">
-            <p className="text-xs text-indigo-400 font-medium">
-              Click Analyze to see skill matching
-            </p>
+
+            {/* Show detailed analysis if available */}
+            {analysisResult ? (
+              <div className="space-y-1.5">
+                <p className="text-sm font-medium text-slate-800">
+                  {analysisResult.strengths[0] || "Good match for this role"}
+                </p>
+                {analysisResult.missing_skills.critical?.length > 0 && (
+                  <p className="text-xs text-muted">
+                    Missing:{" "}
+                    <span className="text-red-600 font-medium">
+                      {analysisResult.missing_skills.critical
+                        .slice(0, 2)
+                        .join(", ")}
+                    </span>
+                  </p>
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500">
+                Click "Analyze" for detailed skill gap analysis
+              </p>
+            )}
           </div>
         )}
       </div>
 
       {/* Action Buttons */}
       <div className="flex gap-3 mt-6">
-        <Button
+        <LinkButton
+          href={`${job.url}`}
+          target="_blank"
           variant="primary"
           className="flex-1 rounded-xl py-2.5 text-sm font-bold"
-          onClick={() => window.open(job.url, "_blank")}
+          showLoadingOnClick
         >
           View Details
-        </Button>
+        </LinkButton>
         <Button
           variant="outline"
-          className="flex-1 rounded-xl py-2.5 text-sm font-bold border-slate-200 bg-slate-50/50 hover:bg-slate-100"
+          className="flex-1 rounded-xl py-2.5 text-sm font-bold"
           onClick={handleAnalyze}
           isLoading={isAnalyzing}
+          disabled={!cvData || !userId}
         >
-          Quick Apply
+          {analysisResult ? "Re-analyze" : "Analyze"}
         </Button>
       </div>
 
+      {/* Analysis Modal */}
       {showModal && (
         <AnalysisModal
           isOpen={showModal}

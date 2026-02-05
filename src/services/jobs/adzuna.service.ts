@@ -1,5 +1,25 @@
-// src/services/jobs/adzuna.service.ts
-import { normalizeAdzunaJob } from "@/lib/jobs/normalizeAzunaJob";
+// src/services/jobs/adzuna-final.service.ts
+// ============================================================================
+// FINAL VERSION - Works with Your Existing Database Schema
+// ============================================================================
+
+import {
+  normalizeAdzunaJob,
+  NormalizedJob,
+} from "@/lib/jobs/normalizeAzunaJob";
+import {
+  cacheJob,
+  cacheJobsBatch,
+  cacheScoresBatch,
+  getCachedScore,
+  jobCache,
+} from "@/lib/jobs/job-storage-adapted.service";
+import {
+  calculateJobMatches,
+  calculateMatchScore,
+} from "@/lib/jobs/matchScore";
+import { prisma } from "@/lib/prisma";
+import { calculateMVPMatchScore } from "@/lib/jobs/mvpMatcher";
 
 interface FetchAdzunaParams {
   keyword?: string;
@@ -19,61 +39,39 @@ interface FetchAdzunaParams {
   companyName?: string;
 }
 
-interface AdzunaJob {
-  id: string;
-  created: string;
-  title: string;
-  location: {
-    area: string[];
-    display_name: string;
-  };
-  description: string;
-  salary_min?: number;
-  salary_max?: number;
-  salary_is_predicted?: string;
-  contract_type?: string;
-  contract_time?: string;
-  company: {
-    display_name: string;
-  };
-  category: {
-    label: string;
-    tag: string;
-  };
-  redirect_url: string;
-}
-
 interface AdzunaResponse {
-  results: AdzunaJob[];
+  results: any[];
   count: number;
-  mean?: number;
-  __CLASS__?: string;
 }
 
 /**
- * Fetch jobs from Adzuna API with advanced filtering
- * @param params - Search parameters
- * @returns Normalized job listings
+ * Fetch jobs from Adzuna API with automatic caching
+ * This version caches all fetched jobs automatically
  */
-export async function fetchAdzunaJobs({
-  keyword = "Developer",
-  location,
-  isRemote = false,
-  countryCode = "sg",
-  page = 1,
-  resultsPerPage = 10,
-  maxDays = 14,
-  salaryMin,
-  salaryMax,
-  fullTime,
-  partTime,
-  contract,
-  permanent,
-  category,
-  companyName,
-}: FetchAdzunaParams) {
+export async function fetchAdzunaJobs(
+  params: FetchAdzunaParams,
+  userId?: string,
+) {
+  const {
+    keyword = "Developer",
+    location,
+    isRemote = false,
+    countryCode = "sg",
+    page = 1,
+    resultsPerPage = 10,
+    maxDays = 14,
+    salaryMin,
+    salaryMax,
+    fullTime,
+    partTime,
+    contract,
+    permanent,
+    category,
+    companyName,
+  } = params;
+
   try {
-    // Validasi credentials
+    // Validate credentials
     if (!process.env.ADZUNA_APP_ID || !process.env.ADZUNA_APP_KEY) {
       throw new Error("Adzuna API credentials are missing");
     }
@@ -100,7 +98,6 @@ export async function fetchAdzunaJobs({
 
     // Remote jobs filter
     if (isRemote) {
-      // Combine dengan keyword untuk mencari remote jobs
       const remoteKeyword = keyword
         ? `${keyword} remote OR work from home`
         : "remote OR work from home";
@@ -116,18 +113,10 @@ export async function fetchAdzunaJobs({
     }
 
     // Contract type filters
-    if (fullTime) {
-      url.searchParams.set("full_time", "1");
-    }
-    if (partTime) {
-      url.searchParams.set("part_time", "1");
-    }
-    if (contract) {
-      url.searchParams.set("contract", "1");
-    }
-    if (permanent) {
-      url.searchParams.set("permanent", "1");
-    }
+    if (fullTime) url.searchParams.set("full_time", "1");
+    if (partTime) url.searchParams.set("part_time", "1");
+    if (contract) url.searchParams.set("contract", "1");
+    if (permanent) url.searchParams.set("permanent", "1");
 
     // Category filter
     if (category) {
@@ -139,7 +128,7 @@ export async function fetchAdzunaJobs({
       url.searchParams.set("company", companyName);
     }
 
-    // Max days old filter (menggunakan max_days_old parameter dari Adzuna)
+    // Max days old filter
     if (maxDays) {
       url.searchParams.set("max_days_old", maxDays.toString());
     }
@@ -176,8 +165,8 @@ export async function fetchAdzunaJobs({
 
     console.log(`Found ${rawJobs.length} jobs from Adzuna`);
 
-    // Additional client-side filtering (backup jika API filter tidak work)
-    const filteredJobs = rawJobs.filter((job: AdzunaJob) => {
+    // Additional client-side filtering
+    const filteredJobs = rawJobs.filter((job: any) => {
       // Filter by date if created field exists
       if (job.created && maxDays) {
         const diffDays =
@@ -204,9 +193,111 @@ export async function fetchAdzunaJobs({
     });
 
     // Normalize jobs
-    const normalizedJobs = filteredJobs.map(normalizeAdzunaJob);
+    let normalizedJobs = filteredJobs.map(normalizeAdzunaJob);
 
-    // console.log(normalizedJobs)
+    // if (userId && normalizedJobs.length > 0) {
+    //   const userCV = await prisma.cvs.findUnique({
+    //     where: { user_id: userId },
+    //     select: { skills: true },
+    //   });
+
+    //   if (userCV?.skills?.length) {
+    //     const skills = userCV.skills;
+    //     const jobsToScore: NormalizedJob[] = [];
+
+    //     // 1️⃣ Ambil score dari Redis
+    //     const jobsWithScores = await Promise.all(
+    //       normalizedJobs.map(async (job) => {
+    //         const cachedScore = await getCachedScore(userId, job.id);
+
+    //         if (cachedScore !== null) {
+    //           return { ...job, matchScore: cachedScore };
+    //         }
+
+    //         jobsToScore.push(job);
+    //         return job;
+    //       }),
+    //     );
+
+    //     // 2️⃣ Hitung AI jika perlu
+    //     if (jobsToScore.length > 0) {
+    //       const aiScores = await calculateJobMatches(
+    //         skills,
+    //         jobsToScore.map((j) => ({
+    //           id: j.id,
+    //           content: `${j.title} ${j.description}`,
+    //         })),
+    //       );
+
+    //       if (Array.isArray(aiScores) && aiScores.length > 0) {
+    //         await cacheScoresBatch(userId, aiScores);
+    //         // ... update scores
+    //       } else {
+    //         // Fallback: gunakan calculateMatchScore yang sederhana
+    //         console.log("⚠️ Using fallback scoring due to AI failure");
+    //         const fallbackScores = jobsToScore.map((job) => ({
+    //           id: job.id,
+    //           score: calculateMatchScore(
+    //             skills,
+    //             `${job.title} ${job.description}`,
+    //           ),
+    //         }));
+    //         await cacheScoresBatch(userId, fallbackScores);
+    //         // ... update dengan fallbackScores
+    //       }
+    //     }
+
+    //     normalizedJobs = jobsWithScores;
+
+    //     // ✅ 3️⃣ CACHE SETELAH SCORE FINAL
+    //     await Promise.all(normalizedJobs.map((job) => cacheJob(job.id, job)));
+    //   }
+    // }
+
+    if (userId && normalizedJobs.length > 0) {
+      const userCV = await prisma.cvs.findUnique({
+        where: { user_id: userId },
+        select: { skills: true },
+      });
+
+      if (userCV?.skills?.length) {
+        // Cek cache dulu
+        const jobsWithScores = await Promise.all(
+          normalizedJobs.map(async (job) => {
+            const cachedScore = await getCachedScore(userId, job.id);
+
+            if (cachedScore !== null) {
+              return { ...job, matchScore: cachedScore };
+            }
+
+            // Hitung score menggunakan MVP matcher
+            const matchResult = await calculateMVPMatchScore(
+              userId,
+              job.title,
+              job.description,
+              job.location,
+              job.isRemote || false,
+            );
+
+            return { ...job, matchScore: matchResult.score };
+          }),
+        );
+
+        // Cache semua scores yang baru dihitung
+        const scoresToCache = jobsWithScores
+          .filter((job) => job.matchScore !== undefined)
+          .map((job) => ({ id: job.id, score: job.matchScore! }));
+
+        if (scoresToCache.length > 0) {
+          await cacheScoresBatch(userId, scoresToCache);
+        }
+
+        normalizedJobs = jobsWithScores;
+
+        // Cache jobs juga
+        await cacheJobsBatch(normalizedJobs);
+      }
+    }
 
     return {
       jobs: normalizedJobs,
@@ -271,8 +362,6 @@ export async function getLocationSuggestions(
       throw new Error("Adzuna API credentials are missing");
     }
 
-    // Adzuna doesn't have dedicated location autocomplete,
-    // but we can provide common locations based on country
     const locationsByCountry: Record<string, string[]> = {
       sg: [
         "Singapore",
@@ -289,7 +378,7 @@ export async function getLocationSuggestions(
         "Medan",
         "Semarang",
         "Makassar",
-        "Palembang",
+        "Palembung",
         "Tangerang",
         "Depok",
         "Bekasi",
@@ -371,6 +460,21 @@ export async function getAdzunaSalaryStats({
     return data;
   } catch (err) {
     console.error("Error fetching salary stats:", err);
+    return null;
+  }
+}
+
+export async function getAdzunaJobById(jobId: string, countryCode = "sg") {
+  try {
+    const url = `https://api.adzuna.com/v1/api/jobs/${countryCode}/details/${jobId}?app_id=${process.env.ADZUNA_APP_ID}&app_key=${process.env.ADZUNA_APP_KEY}&content-type=application/json`;
+
+    const res = await fetch(url);
+    if (!res.ok) return null;
+
+    const jobData = await res.json();
+    return normalizeAdzunaJob(jobData); // Pastikan di-normalize agar formatnya sama
+  } catch (error) {
+    console.error("Error fetching single job from Adzuna:", error);
     return null;
   }
 }
