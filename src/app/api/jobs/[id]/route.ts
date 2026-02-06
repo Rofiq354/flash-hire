@@ -5,6 +5,7 @@ import {
   getCachedJob,
   getSavedJobById,
 } from "@/lib/jobs/job-storage-adapted.service";
+import { NormalizedJob } from "@/lib/jobs/normalizeAzunaJob";
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -42,7 +43,7 @@ export async function GET(
 
       if (anyUserSaved) {
         job = anyUserSaved;
-        await cacheJob(jobId, job);
+        await cacheJob(jobId, job as NormalizedJob);
       }
     }
 
