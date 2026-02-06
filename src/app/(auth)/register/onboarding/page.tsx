@@ -2,12 +2,21 @@
 import { AuthTemplate } from "@/components/templates/AuthTemplate";
 import { RegisterInfo } from "@/components/organisms/AuthInfoSection";
 import { Input } from "@/components/atoms/Input";
-import { Button } from "@/components/atoms/Button";
 import { completeOnboarding } from "../../actions";
+import { ErrorCleaner } from "../../login/ErrorCleaner";
+import { AuthAlert } from "@/components/molecules/AuthAlert";
+import { SubmitButton } from "../../login/SubmitButton";
+import { Select } from "@/components/atoms/Select";
+import { ADZUNA_COUNTRIES } from "@/constants/countries";
 
-export default function OnboardingPage() {
+export default function OnboardingPage({
+  searchParams,
+}: {
+  searchParams: { error?: string };
+}) {
   const formContent = (
     <div className="space-y-8">
+      <ErrorCleaner />
       <div>
         <h2 className="text-3xl font-bold text-slate-900">
           Complete Your Profile
@@ -16,6 +25,8 @@ export default function OnboardingPage() {
           Help us find the right opportunities for you.
         </p>
       </div>
+
+      <AuthAlert error={searchParams.error} />
 
       <form action={completeOnboarding} className="space-y-5">
         <Input
@@ -26,11 +37,11 @@ export default function OnboardingPage() {
           required
         />
         <div className="grid grid-cols-2 gap-4">
-          <Input
+          <Select
             label="Country"
             name="country"
             id="country"
-            placeholder="Indonesia"
+            options={ADZUNA_COUNTRIES}
             required
           />
           <Input
@@ -50,9 +61,9 @@ export default function OnboardingPage() {
           required
         />
 
-        <Button type="submit" className="w-full">
+        <SubmitButton className="w-full text-base shadow-indigo-100">
           Finish & Go to Dashboard
-        </Button>
+        </SubmitButton>
       </form>
     </div>
   );

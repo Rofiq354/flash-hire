@@ -18,12 +18,16 @@ export async function GET(request: Request) {
 
   try {
     const result = await handleOAuthCallback(supabase, code, mode);
+
     return NextResponse.redirect(`${origin}${result.redirect}`);
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Autentikasi gagal. Silahkan coba lagi.";
+  } catch (error: any) {
+    let message = "Autentikasi gagal.";
+
+    if (error.message === "LOGIN_WITHOUT_PROFILE") {
+      message = "Akun tidak ditemukan. Silahkan daftar terlebih dahulu.";
+    } else if (error.message === "AUTH_FAILED") {
+      message = "Gagal menghubungkan ke Google.";
+    }
 
     return NextResponse.redirect(
       `${origin}/login?error=${encodeURIComponent(message)}`,

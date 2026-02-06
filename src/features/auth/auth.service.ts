@@ -15,7 +15,7 @@ export async function handleOAuthCallback(
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("id")
+    .select("id, job_title, country, phone_number")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -28,9 +28,12 @@ export async function handleOAuthCallback(
     throw new Error("LOGIN_WITHOUT_PROFILE");
   }
 
-  if (mode === "register" && profile) {
-    return { redirect: "/dashboard" };
+  const isProfileIncomplete =
+    !profile || !profile.job_title || !profile.country || !profile.phone_number;
+
+  if (isProfileIncomplete) {
+    return { redirect: "/register/onboarding" };
   }
 
-  return { redirect: "/dashboard" };
+  return { redirect: "/my-cv" };
 }

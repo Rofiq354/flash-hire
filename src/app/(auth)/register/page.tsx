@@ -3,10 +3,11 @@ import { AuthTemplate } from "@/components/templates/AuthTemplate";
 import { RegisterInfo } from "@/components/organisms/AuthInfoSection";
 import { AuthAlert } from "@/components/molecules/AuthAlert";
 import { Input } from "@/components/atoms/Input";
-import { Button } from "@/components/atoms/Button";
 import { signUp } from "../actions";
 import Link from "next/link";
 import GoogleAuthButton from "@/components/molecules/GoogleAuthButton";
+import { ErrorCleaner } from "../login/ErrorCleaner";
+import { SubmitButton } from "../login/SubmitButton";
 
 export default function RegisterPage({
   searchParams,
@@ -15,24 +16,21 @@ export default function RegisterPage({
 }) {
   const formContent = (
     <div className="space-y-8">
+      <ErrorCleaner />;
       <div>
         <h2 className="text-3xl font-bold text-slate-900">Create Account</h2>
         <p className="mt-2 text-slate-600">
           Start your career journey with AI today.
         </p>
       </div>
-
       <AuthAlert error={searchParams.error} />
-
       <GoogleAuthButton mode="register" />
-
       <div className="relative flex items-center justify-center py-2">
         <div className="w-full border-t border-slate-200"></div>
         <span className="absolute bg-white px-4 text-xs font-medium uppercase text-slate-400">
           Or continue with email
         </span>
       </div>
-
       <form action={signUp} className="space-y-5">
         <Input
           label="Full Name"
@@ -60,11 +58,10 @@ export default function RegisterPage({
           required
         />
 
-        <Button type="submit" className="w-full">
+        <SubmitButton className="w-full text-base shadow-indigo-100">
           Create Account
-        </Button>
+        </SubmitButton>
       </form>
-
       <p className="text-center text-sm text-slate-600">
         Already have an account?{" "}
         <Link href="/login" className="font-bold text-primary hover:underline">
@@ -78,7 +75,7 @@ export default function RegisterPage({
     <AuthTemplate
       formSection={formContent}
       infoSection={<RegisterInfo />}
-      reverse={false} // Form di kiri, gambar di kanan
+      reverse={false}
     />
   );
 }

@@ -36,7 +36,6 @@ export async function signUp(formData: FormData) {
 export async function completeOnboarding(formData: FormData) {
   const supabase = createClient();
 
-  // 1. Ambil user ID dari sesi yang aktif
   const {
     data: { user },
     error: authError,
@@ -46,13 +45,11 @@ export async function completeOnboarding(formData: FormData) {
     return redirect("/login");
   }
 
-  // 2. Ambil data dari form
-  const job_title = formData.get("job_title") as string;
+  const job_title = (formData.get("job_title") as string)?.trim();
   const country = formData.get("country") as string;
-  const location = formData.get("location") as string;
-  const phone_number = formData.get("phone_number") as string;
+  const location = (formData.get("location") as string)?.trim();
+  const phone_number = (formData.get("phone_number") as string)?.trim();
 
-  // 3. Update tabel profiles di schema public
   const { error } = await supabase
     .from("profiles")
     .update({
@@ -61,17 +58,16 @@ export async function completeOnboarding(formData: FormData) {
       location,
       phone_number,
     })
-    .eq("id", user.id); // Pastikan ID sama dengan ID user yang login
+    .eq("id", user.id);
 
   if (error) {
     console.error("Gagal update profil:", error.message);
     return redirect(
-      `/register/onboarding?error=${encodeURIComponent(error.message)}`,
+      `/register/onboarding?error=${encodeURIComponent("Failed to update profile. Please try again.")}`,
     );
   }
 
-  // 4. Selesai! Arahkan ke dashboard
-  return redirect("/dashboard");
+  return redirect("/my-cv");
 }
 
 export async function signIn(formData: FormData) {
@@ -94,7 +90,6 @@ export async function signIn(formData: FormData) {
 
   console.log("Login Berhasil! Mengalihkan ke dashboard...");
 
-  // Jika berhasil, Supabase otomatis mengatur cookie session
   return redirect("/dashboard");
 }
 
@@ -107,7 +102,7 @@ export async function logout() {
     console.error("Error logging out:", error.message);
   }
 
-  return redirect("/login");
+  return redirect("/");
 }
 
 export async function deleteAccount() {
@@ -122,21 +117,17 @@ export async function deleteAccount() {
     throw new Error("Kamu harus login untuk menghapus akun.");
   }
 
-  // 2. Inisialisasi Admin Client (Butuh Service Role Key)
-  // Ini diperlukan karena user biasa tidak punya izin hapus di auth.users
   const supabaseAdmin = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!, // Ambil dari Dashboard Supabase -> Settings -> API
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 
-  // 3. Hapus User
   const { error } = await supabaseAdmin.auth.admin.deleteUser(user.id);
 
   if (error) {
     return { error: error.message };
   }
 
-  // 4. Logout dan bersihkan cookies
   await supabaseServer.auth.signOut();
 
   revalidatePath("/", "layout");
