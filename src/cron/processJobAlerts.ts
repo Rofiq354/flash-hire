@@ -7,13 +7,16 @@ function shouldRun(alert: any) {
 
   const now = new Date();
   const last = new Date(alert.last_sent_at);
+  const diffInMs = now.getTime() - last.getTime();
 
-  if (alert.frequency === "Daily") {
-    return now.getTime() - last.getTime() >= 24 * 60 * 60 * 1000;
+  const frequency = alert.frequency?.toLowerCase();
+
+  if (frequency === "daily") {
+    return diffInMs >= 24 * 60 * 60 * 1000;
   }
 
-  if (alert.frequency === "Weekly") {
-    return now.getTime() - last.getTime() >= 7 * 24 * 60 * 60 * 1000;
+  if (frequency === "weekly") {
+    return diffInMs >= 7 * 24 * 60 * 60 * 1000;
   }
 
   return false;
@@ -40,7 +43,6 @@ export async function processJobAlerts() {
       });
     } catch (err) {
       console.error(`[ALERT_FAILED] ${alert.id}`, err);
-      // lanjut ke alert berikutnya
     }
   }
 

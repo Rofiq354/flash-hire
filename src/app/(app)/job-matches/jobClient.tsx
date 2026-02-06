@@ -18,18 +18,6 @@ export default function JobClient({
 }) {
   const jobs = initialJobs;
 
-  // const jobsWithScore = useMemo(() => {
-  //   if (!initialCv?.skills) return initialJobs;
-
-  //   return initialJobs.map((job) => ({
-  //     ...job,
-  //     matchScore: calculateMatchScore(
-  //       initialCv.skills,
-  //       `${job.title} ${job.description}`,
-  //     ),
-  //   }));
-  // }, [initialCv?.skills, initialJobs]);
-
   return (
     <div className="space-y-8">
       {/* Header Section */}

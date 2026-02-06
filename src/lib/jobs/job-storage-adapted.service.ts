@@ -186,12 +186,7 @@ export async function cacheJob(jobId: string, job: NormalizedJob) {
   if (!redis) return;
 
   try {
-    // Gunakan setex dengan parameter terpisah
-    await redis.setex(
-      `job:${jobId}`,
-      60 * 60, // TTL dalam detik
-      JSON.stringify(job), // Value harus string
-    );
+    await redis.setex(`job:${jobId}`, 60 * 60, JSON.stringify(job));
   } catch (error) {
     console.error("❌ Redis cache job failed:", error);
   }

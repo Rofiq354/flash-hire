@@ -26,40 +26,40 @@ export async function evaluateMatch(
   },
 ): Promise<MatchResult> {
   const prompt = `
-You are an AI technical recruiter.
+    You are an AI technical recruiter.
 
-Evaluate how well the candidate matches the job.
+    Evaluate how well the candidate matches the job.
 
-EVALUATION RULES:
-- Score range: 0–100
-- Base score on HARD SKILLS and RELEVANT EXPERIENCE only
-- Penalize missing REQUIRED skills mentioned explicitly in the job description
-- Do NOT infer skills not present in the CV
-- Do NOT mention soft skills unless explicitly required
+    EVALUATION RULES:
+    - Score range: 0–100
+    - Base score on HARD SKILLS and RELEVANT EXPERIENCE only
+    - Penalize missing REQUIRED skills mentioned explicitly in the job description
+    - Do NOT infer skills not present in the CV
+    - Do NOT mention soft skills unless explicitly required
 
-JOB:
-Title: ${job.title}
+    JOB:
+    Title: ${job.title}
 
-Description:
-${job.description}
+    Description:
+    ${job.description}
 
-Candidate CV (structured JSON):
-${JSON.stringify(cv)}
+    Candidate CV (structured JSON):
+    ${JSON.stringify(cv)}
 
-OUTPUT FORMAT:
-Return ONLY valid JSON exactly in this shape:
-{
-  "score": number,
-  "match_reasons": string[],
-  "missing_skills": string[],
-  "advice": string
-}
+    OUTPUT FORMAT:
+    Return ONLY valid JSON exactly in this shape:
+    {
+      "score": number,
+      "match_reasons": string[],
+      "missing_skills": string[],
+      "advice": string
+    }
 
-OUTPUT RULES:
-- match_reasons: factual, skill-based, max 4 items
-- missing_skills: concrete technical skills only
-- advice: 1–2 sentences, actionable, no motivational fluff
-`;
+    OUTPUT RULES:
+    - match_reasons: factual, skill-based, max 4 items
+    - missing_skills: concrete technical skills only
+    - advice: 1–2 sentences, actionable, no motivational fluff
+  `;
 
   try {
     const response = await genai.models.generateContent({
@@ -75,7 +75,14 @@ OUTPUT RULES:
       },
     });
 
-    const text = response.response.text();
+    const text = response.candidates?.[0]?.content?.parts
+      ?.map((p) => p.text)
+      .join("");
+
+    if (!text) {
+      throw new Error("No text content in AI Evaluate Service response");
+    }
+
     const parsed = JSON.parse(text);
 
     // 🔒 Hard validation (important)

@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import { fetchAdzunaJobs } from "./jobs/adzuna.service";
 import { calculateMatchScore } from "@/lib/jobs/matchScore";
+import { NormalizedJob } from "@/lib/jobs/normalizeAzunaJob";
 
 interface DashboardData {
   cv: any;
@@ -21,7 +22,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
   });
 
   // 3. Fetch Jobs dari Adzuna pakai alert data
-  let jobs: any[] = [];
+  let jobs: NormalizedJob[] = [];
   if (alert) {
     jobs = await fetchAdzunaJobs({
       keyword: alert.job_title,

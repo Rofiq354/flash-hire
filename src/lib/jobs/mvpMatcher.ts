@@ -24,8 +24,9 @@ export async function calculateMVPMatchScore(
   jobId: string,
   jobTitle: string,
   jobDescription: string,
+  locationType: "remote" | "onsite" | "hybrid",
+  userWantsRemote: boolean = false,
   jobLocation?: string,
-  jobIsRemote: boolean = false,
 ): Promise<MatchResult> {
   // Ambil data CV user dari database
   const userCV = await prisma.cvs.findUnique({
@@ -58,7 +59,6 @@ export async function calculateMVPMatchScore(
     };
   }
 
-  // Extract required skills dari job description menggunakan Claude
   const jobRequirements = await extractJobSkillsCached(
     jobId,
     jobTitle,
@@ -93,7 +93,13 @@ export async function calculateMVPMatchScore(
   for (const requiredSkill of jobRequirements.required_skills) {
     const normalizedRequired = normalizeSkill(requiredSkill);
 
-    if (userSkillsNormalized.includes(normalizedRequired)) {
+    const isMatched = userSkillsNormalized.some(
+      (userSkill) =>
+        normalizedRequired.includes(userSkill) ||
+        userSkill.includes(normalizedRequired),
+    );
+
+    if (isMatched) {
       matchedSkills.push(requiredSkill);
     } else {
       missingSkills.push(requiredSkill);
@@ -117,24 +123,28 @@ export async function calculateMVPMatchScore(
 
   // Hitung location penalty
   let locationPenalty = 0;
-  if (!jobIsRemote && !jobRequirements.is_remote) {
-    // Job tidak remote, cek apakah location match
-    const userLoc = userProfile?.location
-      ? normalizeSkill(userProfile.location)
-      : "";
-    const jobLoc = jobLocation
-      ? normalizeSkill(jobLocation)
-      : jobRequirements.location
-        ? normalizeSkill(jobRequirements.location)
-        : "";
 
-    if (
-      userLoc &&
-      jobLoc &&
-      !jobLoc.includes(userLoc) &&
-      !userLoc.includes(jobLoc)
-    ) {
-      locationPenalty = 10; // -10% jika location tidak match
+  if (userWantsRemote) {
+    if (locationType === "onsite") {
+      locationPenalty = 25; // Penalti sangat besar
+    } else if (locationType === "hybrid") {
+      locationPenalty = 10; // Penalti sedang karena masih harus ngantor
+    }
+  } else {
+    // Jika User mencari kerjaan On-site (userWantsRemote = false)
+    if (locationType === "onsite" || locationType === "hybrid") {
+      // Cek apakah lokasinya cocok dengan domisili di profil
+      const userLoc = normalizeSkill(userProfile?.location || "");
+      const jobLoc = normalizeSkill(jobLocation || "");
+
+      if (
+        userLoc &&
+        jobLoc &&
+        !jobLoc.includes(userLoc) &&
+        !userLoc.includes(jobLoc)
+      ) {
+        locationPenalty = 10; // Penalti jika kota berbeda
+      }
     }
   }
 

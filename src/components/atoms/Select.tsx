@@ -4,7 +4,14 @@
 import React from "react";
 import ReactSelect from "react-select";
 
-export const Select = ({ label, options, onChange, value, id }: any) => {
+export const Select = ({
+  label,
+  options,
+  onChange,
+  value,
+  placeholder = "Choose a country...",
+  id,
+}: any) => {
   return (
     <div className="w-full space-y-1.5">
       {label && (
@@ -16,7 +23,7 @@ export const Select = ({ label, options, onChange, value, id }: any) => {
         id={id}
         name={id}
         options={options}
-        placeholder="Choose a country..."
+        placeholder={placeholder}
         className="text-sm"
         styles={{
           control: (base) => ({

@@ -43,13 +43,6 @@ export function SidebarClient({ onLogout }: SidebarClientProps) {
 
       <div className="pt-6 border-t border-border-custom space-y-2">
         <LogoutButton onLogout={onLogout} />
-
-        <NavItem
-          name="Settings"
-          icon={Settings}
-          href="/dashboard/settings"
-          isActive={isActive("/dashboard/settings")}
-        />
       </div>
     </aside>
   );

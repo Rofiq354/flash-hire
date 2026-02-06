@@ -34,31 +34,28 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const alert = await prisma.job_alerts.upsert({
-      where: {
-        user_id: body.userId,
-      },
+      where: { user_id: body.userId },
       update: {
         job_title: body.job_title,
-        location: body.location,
-        frequency: body.frequency,
+        location: body.location || "",
+        frequency: body.frequency || "daily",
         email: body.email,
+        min_match_score: Number(body.min_match_score) || 70,
         is_active: true,
         updated_at: new Date(),
       },
       create: {
         user_id: body.userId,
         job_title: body.job_title,
-        location: body.location,
-        frequency: body.frequency,
+        location: body.location || "",
+        frequency: body.frequency || "daily",
         email: body.email,
+        min_match_score: Number(body.min_match_score) || 70,
         is_active: true,
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      data: alert,
-    });
+    return NextResponse.json({ success: true, data: alert });
   } catch (error: any) {
     console.error("Error creating job alert:", error);
     return NextResponse.json(
