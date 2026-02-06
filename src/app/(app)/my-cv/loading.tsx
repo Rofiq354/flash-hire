@@ -1,49 +1,61 @@
 // src/app/dashboard/upload/loading.tsx
 export default function UploadLoading() {
   return (
-    <main className="min-h-screen bg-[#F8FAFC] p-8">
-      <div className="max-w-5xl mx-auto pt-12">
-        {/* Header Skeleton - Centered */}
-        <header className="mb-12 text-center animate-pulse">
-          <div className="h-10 w-80 bg-slate-200 rounded-2xl mx-auto mb-3" />
-          <div className="h-4 w-full max-w-xl bg-slate-100 rounded-lg mx-auto" />
-          <div className="h-4 w-64 bg-slate-100 rounded-lg mx-auto mt-2" />
-        </header>
+    <main className="min-h-screen bg-[#F8FAFC]">
+      <div className="mx-auto px-4 sm:px-6">
+        {/* Navigation Breadcrumb Placeholder */}
+        <div className="h-4 w-32 bg-slate-200/60 rounded-md mb-8 animate-pulse" />
 
-        {/* Grid Layout Skeleton (Matching DashboardInitial) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left: UploadCard Skeleton (2 Columns) */}
-          <div className="lg:col-span-2">
-            <div className="bg-white border border-slate-100 p-8 rounded-4xl shadow-sm animate-pulse">
-              <div className="max-w-md mx-auto space-y-6">
-                {/* Text Skeletons */}
-                <div className="space-y-2">
-                  <div className="h-6 w-48 bg-slate-200 rounded-lg mx-auto" />
-                  <div className="h-4 w-full bg-slate-100 rounded-md mx-auto" />
-                </div>
+          {/* Sidebar / Left Column Skeleton */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Profile/Info Card Skeleton */}
+            <div className="bg-white p-8 rounded-4xl border border-slate-200 shadow-sm animate-pulse">
+              <div className="h-16 w-16 bg-slate-200 rounded-2xl mb-6" />
+              <div className="h-7 w-40 bg-slate-200 rounded-lg mb-3" />
+              <div className="h-4 w-32 bg-slate-100 rounded-md" />
+              <div className="mt-6 pt-6 border-t border-slate-50 space-y-3">
+                <div className="h-3 w-full bg-slate-50 rounded" />
+                <div className="h-3 w-2/3 bg-slate-50 rounded" />
+              </div>
+            </div>
 
-                {/* Dropzone Skeleton */}
-                <div className="h-64 w-full bg-slate-50 rounded-4xl border-2 border-dashed border-slate-100" />
-
-                {/* Button Area placeholder */}
-                <div className="h-12 w-32 bg-slate-100 rounded-2xl mx-auto" />
+            {/* Skills/Pro-tip Card Skeleton */}
+            <div className="bg-white p-8 rounded-4xl border border-slate-200 shadow-sm animate-pulse">
+              <div className="h-4 w-24 bg-slate-200 rounded mb-5" />
+              <div className="flex flex-wrap gap-2">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="h-7 w-16 bg-slate-100 rounded-xl" />
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Right: Pro Tip Skeleton (1 Column) */}
-          <div className="space-y-6">
-            <div className="bg-indigo-50/50 p-8 rounded-4xl border border-indigo-100 animate-pulse">
-              {/* Icon placeholder */}
-              <div className="h-12 w-12 bg-white rounded-2xl mb-4" />
-              {/* Title */}
-              <div className="h-5 w-24 bg-indigo-200/50 rounded-md mb-2" />
-              {/* Description */}
-              <div className="space-y-2">
-                <div className="h-3 w-full bg-indigo-100/50 rounded-md" />
-                <div className="h-3 w-full bg-indigo-100/50 rounded-md" />
-                <div className="h-3 w-3/4 bg-indigo-100/50 rounded-md" />
+          {/* Main Content / Right Column Skeleton */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Large Content Card (Summary/Upload Area) */}
+            <div className="bg-white p-8 rounded-4xl border border-slate-200 shadow-sm animate-pulse">
+              <div className="h-6 w-32 bg-slate-200 rounded mb-6" />
+              <div className="space-y-3">
+                <div className="h-4 w-full bg-slate-100 rounded" />
+                <div className="h-4 w-full bg-slate-100 rounded" />
+                <div className="h-4 w-3/4 bg-slate-100 rounded" />
               </div>
+            </div>
+
+            {/* List Item Skeleton (Experience/History) */}
+            <div className="bg-white p-8 rounded-4xl border border-slate-200 shadow-sm animate-pulse">
+              <div className="h-6 w-48 bg-slate-200 rounded mb-8" />
+              {[1, 2].map((i) => (
+                <div key={i} className="mb-8 flex gap-4">
+                  <div className="h-12 w-12 bg-slate-100 rounded-xl shrink-0" />
+                  <div className="flex-1 space-y-3">
+                    <div className="h-4 w-1/3 bg-slate-200 rounded" />
+                    <div className="h-3 w-1/4 bg-slate-100 rounded" />
+                    <div className="h-16 w-full bg-slate-50 rounded-xl" />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

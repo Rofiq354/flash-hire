@@ -17,13 +17,13 @@ export const CvItem = ({
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center justify-between rounded-2xl border-2 border-primary/20 bg-primary/5 p-4 transition-all hover:bg-primary/8">
-      <div className="flex items-center gap-4">
-        <div className="rounded-xl bg-white p-3 shadow-sm border border-primary/10">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start md:items-center rounded-2xl border-2 border-primary/20 bg-primary/5 p-4 transition-all hover:bg-primary/8">
+      <div className="flex items-center gap-4 w-full">
+        <div className="rounded-xl bg-white p-3 shadow-sm border border-primary/10 shrink-0">
           <FileText size={20} className="text-primary" />
         </div>
-        <div>
-          <h3 className="font-bold text-sm truncate max-w-50">
+        <div className="min-w-0 flex-1">
+          <h3 className="font-bold text-sm truncate max-w-50 md:max-w-50">
             {cv.file_name || "Untitled CV"}
           </h3>
           <p className="text-[11px] text-muted">
@@ -32,23 +32,27 @@ export const CvItem = ({
         </div>
       </div>
 
-      <div className="mt-4 flex w-full md:mt-0 md:w-auto gap-2">
+      <div className="flex w-full md:justify-end gap-2 border-t border-primary/5 pt-3 md:border-0 md:pt-0">
         <Button
           variant="outline"
           size="sm"
-          className="h-9 text-xs"
+          className="h-9 text-xs flex-1 md:flex-none"
           onClick={handleView}
         >
           <Eye size={14} className="mr-1" /> View
         </Button>
 
-        <Button variant="secondary" size="sm" className="h-9 text-xs">
+        <Button
+          variant="secondary"
+          size="sm"
+          className="h-9 text-xs flex-1 md:flex-none"
+        >
           <Sparkles size={14} className="mr-1" /> Edit Skills
         </Button>
 
         <button
           onClick={() => onDelete(cv.id)}
-          className="p-2 text-red-400 hover:text-red-600 transition-colors ml-1"
+          className="p-2 text-red-400 hover:text-red-600 transition-colors shrink-0"
         >
           <Trash2 size={18} />
         </button>
