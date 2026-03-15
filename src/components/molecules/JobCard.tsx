@@ -84,7 +84,7 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
                 {matchScore}% Match
               </span>
             )}
-            <span className="px-3 py-1 bg-slate-100 text-muted text-[10px] font-bold rounded-full uppercase tracking-wider">
+            <span className="px-3 py-1 bg-muted/10 text-muted text-[10px] font-bold rounded-full uppercase tracking-wider">
               {job.contractType || "Full-time"}
             </span>
           </div>
@@ -98,11 +98,11 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
           </h2>
           <div className="flex items-center gap-2 text-sm font-medium text-muted">
             <span>{job.company}</span>
-            <span className="text-slate-300">•</span>
+            <span className="text-border-custom">•</span>
             <span className="flex items-center gap-1">
               <MapPin className="h-3.5 w-3.5" /> {job.location}
             </span>
-            <span className="text-slate-300">•</span>
+            <span className="text-border-custom">•</span>
             <span className="flex items-center gap-1 capitalize">
               <Briefcase className="h-3.5 w-3.5" /> {job.locationType}
             </span>
@@ -110,13 +110,19 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
         </div>
 
         {matchScore !== null && (
-          <div className="mt-5 bg-slate-50 border border-slate-100 rounded-2xl p-4">
+          <div className="mt-5 bg-muted/5 border border-border-custom rounded-2xl p-4 transition-all">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+              <p className="text-[10px] font-black text-muted uppercase tracking-wider">
                 Quick Match
               </p>
               <span
-                className={`text-xs font-bold ${matchScore >= 75 ? "text-emerald-600" : matchScore >= 50 ? "text-amber-600" : "text-red-600"}`}
+                className={`text-[10px] font-bold uppercase ${
+                  matchScore >= 75
+                    ? "text-emerald-600"
+                    : matchScore >= 50
+                      ? "text-amber-600"
+                      : "text-rose-600"
+                }`}
               >
                 {matchScore >= 75
                   ? "Strong"
@@ -128,13 +134,13 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
 
             {analysisResult ? (
               <div className="space-y-1.5">
-                <p className="text-sm font-medium text-slate-800">
+                <p className="text-sm font-semibold text-foreground">
                   {analysisResult.strengths[0] || "Good match for this role"}
                 </p>
                 {analysisResult.missing_skills.critical?.length > 0 && (
                   <p className="text-xs text-muted">
                     Missing:{" "}
-                    <span className="text-red-600 font-medium">
+                    <span className="text-rose-600 font-medium">
                       {analysisResult.missing_skills.critical
                         .slice(0, 2)
                         .join(", ")}
@@ -143,7 +149,7 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
                 )}
               </div>
             ) : (
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted italic">
                 Click "Analyze" for detailed skill gap analysis
               </p>
             )}

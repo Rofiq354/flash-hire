@@ -48,7 +48,7 @@ export const Button = ({
   const variants = {
     primary:
       "bg-primary text-white shadow-xl shadow-primary/20 hover:bg-primary/80",
-    secondary: "bg-foreground/80 text-white hover:bg-foreground",
+    secondary: "bg-foreground/20 text-white hover:bg-foreground/5",
     outline:
       "border border-border-custom bg-card text-muted hover:bg-primary/10",
     ghost: "bg-transparent text-muted hover:text-muted/80 hover:bg-primary/20",
@@ -105,11 +105,10 @@ export const LinkButton = ({
   const variants = {
     primary:
       "bg-primary text-white shadow-xl shadow-primary/20 hover:bg-primary/80",
-    secondary: "bg-slate-800 text-white hover:bg-slate-900",
+    secondary: "bg-foreground/20 text-white hover:bg-foreground/5",
     outline:
-      "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
-    ghost:
-      "bg-transparent text-foreground hover:text-background hover:bg-slate-100",
+      "border border-border-custom bg-card text-muted hover:bg-primary/10",
+    ghost: "bg-transparent text-muted hover:text-muted/80 hover:bg-primary/20",
   };
 
   const handleClick = (e: React.MouseEvent) => {

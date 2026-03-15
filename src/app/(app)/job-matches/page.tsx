@@ -40,7 +40,7 @@ export default async function Page({
       resultsPerPage: 6,
       maxDays: 14,
     },
-    userId, // <--- TAMBAHKAN INI DI SINI
+    userId,
   );
   return (
     <div className="min-h-screen bg-background font-sans">
@@ -49,7 +49,7 @@ export default async function Page({
 
         {/* Static Footer */}
         <footer className="mx-auto mt-16 border-t border-border-custom pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted">
-          <div className="flex items-center gap-2 font-bold text-slate-400 uppercase tracking-tighter">
+          <div className="flex items-center gap-2 font-bold text-muted uppercase tracking-tighter">
             <span className="text-primary italic">⚡ Flash Hire</span>
           </div>
           <div className="flex gap-6">
