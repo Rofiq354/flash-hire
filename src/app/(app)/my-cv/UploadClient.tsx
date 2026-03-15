@@ -6,7 +6,7 @@ import { ExtractionLoading } from "@/components/molecules/ExtractionLoading";
 import { CvResultPreview } from "@/components/organisms/my-cv/CvResultPreview";
 import { uploadAndAnalyzeCV } from "./action";
 import { Button } from "@/components/atoms/Button";
-import { Upload } from "lucide-react";
+import { RefreshCcw, RotateCwIcon, Upload } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 export default function UploadClient({ initialCv }: { initialCv: any }) {
@@ -51,13 +51,23 @@ export default function UploadClient({ initialCv }: { initialCv: any }) {
       <div className="space-y-6 animate-in fade-in zoom-in duration-500">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Extracted Profile</h2>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentCv(null)}
-          >
-            <Upload size={16} className="mr-2" /> Re-upload New CV
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentCv(null)}
+            >
+              <Upload size={16} className="mr-2" /> Re-upload New CV
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.location.reload()}
+              title="Refresh Halaman"
+            >
+              <RefreshCcw size={16} />
+            </Button>
+          </div>
         </div>
 
         <CvResultPreview data={currentCv} />

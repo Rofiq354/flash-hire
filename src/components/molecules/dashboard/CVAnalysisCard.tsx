@@ -17,19 +17,20 @@ export const CVAnalysisCard = ({
   lastUpdated,
   uploadLink,
 }: CVAnalysisCardProps) => (
-  <div className="bg-white p-6 rounded-4xl shadow-sm border border-slate-100">
-    <h3 className="font-bold text-slate-800 mb-6 text-center">
+  <div className="bg-card p-6 rounded-4xl shadow-sm border border-border-custom">
+    <h3 className="font-bold text-foreground mb-6 text-center">
       Your CV Analysis
     </h3>
 
+    {/* Pastikan ProgressCircle juga menggunakan warna primary/border-custom di dalamnya */}
     <ProgressCircle radius={58} progress={matchPower} />
 
-    <p className="text-[11px] text-slate-400 text-center mb-6 italic">
+    <p className="text-[11px] text-muted text-center mb-6 italic">
       Last updated {lastUpdated}
     </p>
 
     <div className="space-y-3">
-      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+      <p className="text-[10px] font-bold text-muted uppercase tracking-widest">
         Extracted Skills
       </p>
       <div className="flex flex-wrap gap-2">
@@ -43,7 +44,7 @@ export const CVAnalysisCard = ({
       <Button
         variant="outline"
         showLoadingOnClick
-        className="w-full mt-8 rounded-2xl border-indigo-100 text-indigo-600 font-bold text-xs hover:bg-indigo-50 transition-all"
+        className="w-full mt-8 rounded-2xl border-primary/20 text-primary font-bold text-xs hover:bg-primary/5 transition-all"
       >
         🔄 Re-upload CV
       </Button>

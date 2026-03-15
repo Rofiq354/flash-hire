@@ -38,11 +38,11 @@ export default function DashboardClient({
   return (
     <div className="space-y-8">
       {/* Judul Dashboard */}
-      <h1 className="text-2xl font-bold text-slate-900">
+      <h1 className="text-2xl font-bold text-foreground">
         Welcome back, {initialUser?.user_metadata.full_name || "User"}!
       </h1>
-      <p className="text-sm text-slate-500">
-        Here’s a quick overview of your CV analysis and top job matches.
+      <p className="text-sm text-muted">
+        Here's a quick overview of your CV analysis and top job matches.
       </p>
 
       {/* Dashboard Content */}

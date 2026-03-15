@@ -1,7 +1,7 @@
 // src/components/atoms/ProgressCircle.tsx
 interface ProgressCircleProps {
   radius: number;
-  progress: number; // 0-100
+  progress: number;
   strokeWidth?: number;
   color?: string;
   bgColor?: string;
@@ -11,16 +11,17 @@ export const ProgressCircle = ({
   radius,
   progress,
   strokeWidth = 10,
-  color = "#4F46E5",
-  bgColor = "#F1F5F9",
+  color = "var(--primary)",
+  bgColor = "var(--border-custom)",
 }: ProgressCircleProps) => {
   const normalizedRadius = radius - strokeWidth / 2;
   const circumference = 2 * Math.PI * normalizedRadius;
   const offset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className="relative flex items-center justify-center">
+    <div className="relative flex items-center justify-center my-4">
       <svg width={radius * 2} height={radius * 2} className="-rotate-90">
+        {/* Lingkaran Background */}
         <circle
           cx={radius}
           cy={radius}
@@ -28,7 +29,9 @@ export const ProgressCircle = ({
           stroke={bgColor}
           strokeWidth={strokeWidth}
           fill="transparent"
+          className="opacity-20"
         />
+        {/* Lingkaran Progress */}
         <circle
           cx={radius}
           cy={radius}
@@ -46,10 +49,12 @@ export const ProgressCircle = ({
       </svg>
 
       <div className="absolute text-center leading-tight">
-        <span className="text-2xl font-bold block text-slate-900">
+        {/* Text Utama (Persentase) */}
+        <span className="text-2xl font-black block text-foreground">
           {progress}%
         </span>
-        <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+        {/* Label Bawah */}
+        <span className="text-[9px] text-muted uppercase font-bold tracking-[0.15em]">
           Match Power
         </span>
       </div>

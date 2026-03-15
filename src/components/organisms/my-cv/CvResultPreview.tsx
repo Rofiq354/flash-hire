@@ -1,7 +1,7 @@
 import { FileText, Briefcase, GraduationCap, Award, Mail } from "lucide-react";
 
 export const CvResultPreview = ({ data }: { data: any }) => {
-  const info = data.parsed_data || {};
+  const info = data.parsed_data || data || {};
 
   // Fungsi untuk grouping experience berdasarkan Perusahaan + Role
   const groupedExperience = info.experience?.reduce((acc: any[], curr: any) => {

@@ -60,7 +60,7 @@ export default async function DashboardPage() {
 
         {/* Static Footer */}
         <footer className="mx-auto mt-16 border-t border-border-custom pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted">
-          <div className="flex items-center gap-2 font-bold text-slate-400 uppercase tracking-tighter">
+          <div className="flex items-center gap-2 font-bold text-primary/40 uppercase tracking-tighter">
             <span className="text-primary italic">⚡ Flash Hire</span>
           </div>
           <div className="flex gap-6">
