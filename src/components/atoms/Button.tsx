@@ -48,11 +48,10 @@ export const Button = ({
   const variants = {
     primary:
       "bg-primary text-white shadow-xl shadow-primary/20 hover:bg-primary/80",
-    secondary: "bg-slate-800 text-white hover:bg-slate-900",
+    secondary: "bg-foreground/80 text-white hover:bg-foreground",
     outline:
-      "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
-    ghost:
-      "bg-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-100",
+      "border border-border-custom bg-card text-muted hover:bg-primary/10",
+    ghost: "bg-transparent text-muted hover:text-muted/80 hover:bg-primary/20",
   };
 
   const sizes = {

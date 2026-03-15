@@ -7,15 +7,13 @@ import ReactSelect from "react-select";
 export const Select = ({
   label,
   options,
-  onChange,
-  value,
   placeholder = "Choose a country...",
   id,
 }: any) => {
   return (
     <div className="w-full space-y-1.5">
       {label && (
-        <label htmlFor={id} className="text-sm font-semibold text-slate-700">
+        <label htmlFor={id} className="text-sm font-semibold text-foreground">
           {label}
         </label>
       )}
@@ -30,10 +28,41 @@ export const Select = ({
             ...base,
             padding: "2px",
             borderRadius: "0.5rem",
-            borderColor: "#e2e8f0",
+            backgroundColor: "var(--input)",
+            borderColor: "var(--border)",
+            color: "var(--foreground)",
+            boxShadow: "none",
+            "&:hover": {
+              borderColor: "var(--primary)",
+            },
+          }),
+          menu: (base) => ({
+            ...base,
+            backgroundColor: "var(--card)",
+            borderRadius: "0.5rem",
+            border: "1px solid var(--border)",
+          }),
+          option: (base, state) => ({
+            ...base,
+            backgroundColor: state.isFocused ? "var(--primary)" : "transparent",
+            color: state.isFocused
+              ? "var(--primary-foreground)"
+              : "var(--card-foreground)",
+            cursor: "pointer",
+            "&:active": {
+              backgroundColor: "var(--primary-hover)",
+            },
+          }),
+          singleValue: (base) => ({
+            ...base,
+            color: "var(--foreground)",
+          }),
+          placeholder: (base) => ({
+            ...base,
+            color: "var(--muted)",
           }),
         }}
-        maxMenuHeight={200} // INI KUNCINYA: Membatasi tinggi dropdown
+        maxMenuHeight={200}
       />
     </div>
   );

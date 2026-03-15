@@ -18,10 +18,10 @@ export default function OnboardingPage({
     <div className="space-y-8">
       <ErrorCleaner />
       <div>
-        <h2 className="text-3xl font-bold text-slate-900">
+        <h2 className="text-3xl font-bold tracking-tight text-foreground">
           Complete Your Profile
         </h2>
-        <p className="mt-2 text-slate-600">
+        <p className="mt-2 text-muted">
           Help us find the right opportunities for you.
         </p>
       </div>

@@ -13,13 +13,13 @@ export const UploadCard = ({
   const [file, setFile] = useState<File | null>(null);
 
   return (
-    <div className="bg-white border border-slate-100 p-8 rounded-4xl shadow-sm">
+    <div className="bg-card border border-border-custom p-8 rounded-4xl shadow-sm">
       <div className="max-w-md mx-auto space-y-6">
         <div className="text-center space-y-2">
-          <h3 className="text-xl font-bold text-slate-900">
+          <h3 className="text-xl font-bold text-foreground">
             Upload your Resume
           </h3>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted">
             Our AI will extract your skills and experiences automatically.
           </p>
         </div>
@@ -31,7 +31,7 @@ export const UploadCard = ({
             <div className="flex items-center gap-3">
               <span className="text-2xl">📄</span>
               <div className="text-left">
-                <p className="text-sm font-semibold text-slate-700 truncate max-w-37.5">
+                <p className="text-sm font-semibold text-muted truncate max-w-37.5">
                   {file.name}
                 </p>
                 <p className="text-xs text-slate-400">

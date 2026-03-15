@@ -25,25 +25,25 @@ export const CvResultPreview = ({ data }: { data: any }) => {
       {/* SIDEBAR: Profile & Skills */}
       <div className="lg:col-span-1 space-y-6">
         {/* Profile Card */}
-        <div className="bg-white p-8 rounded-4xl border border-slate-200 shadow-sm relative overflow-hidden">
+        <div className="bg-card p-8 rounded-4xl border border-border-custom shadow-sm relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <FileText size={80} />
           </div>
 
-          <div className="h-16 w-16 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mb-6 shadow-lg shadow-indigo-200">
+          <div className="h-16 w-16 bg-primary rounded-2xl flex items-center justify-center text-card text-2xl font-bold mb-6 shadow-lg shadow-primary/20">
             {info.full_name?.[0]}
           </div>
 
-          <h3 className="text-2xl font-black text-slate-900 leading-tight">
+          <h3 className="text-2xl font-black text-foreground leading-tight">
             {info.full_name}
           </h3>
 
           <div className="mt-4 space-y-3">
-            <div className="flex items-center gap-2 text-slate-500 text-sm">
+            <div className="flex items-center gap-2 text-muted text-sm">
               <Mail size={14} />
               <span>{info.email}</span>
             </div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-border-custom text-primary rounded-full text-xs font-bold">
               <Award size={14} />
               <span>Match Power: {info.match_power}%</span>
             </div>
@@ -51,15 +51,15 @@ export const CvResultPreview = ({ data }: { data: any }) => {
         </div>
 
         {/* Skills Card */}
-        <div className="bg-white p-8 rounded-4xl border border-slate-200 shadow-sm">
-          <h4 className="font-bold mb-5 text-sm uppercase tracking-[0.2em] text-slate-400">
+        <div className="bg-card p-8 rounded-4xl border border-border-custom shadow-sm">
+          <h4 className="font-bold mb-5 text-sm uppercase tracking-[0.2em] text-foreground">
             Expertise
           </h4>
           <div className="flex flex-wrap gap-2">
             {info.skills?.map((skill: string) => (
               <span
                 key={skill}
-                className="bg-slate-50 text-slate-700 border border-slate-100 px-3 py-1.5 rounded-xl text-xs font-medium hover:border-indigo-200 transition-colors"
+                className="bg-border-custom text-muted border border-border-custom px-3 py-1.5 rounded-xl text-xs font-medium hover:border-primary/50 transition-colors"
               >
                 {skill}
               </span>
@@ -71,19 +71,19 @@ export const CvResultPreview = ({ data }: { data: any }) => {
       {/* MAIN CONTENT: Experience & Education */}
       <div className="lg:col-span-2 space-y-6">
         {/* Summary */}
-        <div className="bg-white p-8 rounded-4xl border border-slate-200 shadow-sm">
+        <div className="bg-card p-8 rounded-4xl border border-border-custom shadow-sm">
           <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
             Summary
           </h4>
-          <p className="text-slate-600 leading-relaxed text-sm italic">
+          <p className="text-muted leading-relaxed text-sm italic">
             "{info.summary}"
           </p>
         </div>
 
         {/* Work Experience */}
-        <div className="bg-white p-8 rounded-4xl border border-slate-200 shadow-sm">
+        <div className="bg-card p-8 rounded-4xl border border-border-custom shadow-sm">
           <h4 className="text-lg font-bold mb-8 flex items-center gap-2">
-            <Briefcase className="text-indigo-600" size={20} />
+            <Briefcase className="text-primary" size={20} />
             Professional Experience
           </h4>
 
@@ -91,16 +91,16 @@ export const CvResultPreview = ({ data }: { data: any }) => {
             {groupedExperience?.map((exp: any, i: number) => (
               <div
                 key={i}
-                className="relative pl-8 border-l-2 border-slate-100"
+                className="relative pl-8 border-l-2 border-border-custom"
               >
-                <div className="absolute w-4 h-4 bg-white border-4 border-indigo-600 rounded-full -left-2.25 top-1" />
+                <div className="absolute w-4 h-4 bg-background border-4 border-primary rounded-full -left-2.25 top-1" />
 
                 <div className="mb-4">
-                  <h5 className="font-black text-slate-900 text-base">
+                  <h5 className="font-black text-foreground text-base">
                     {exp.role}
                   </h5>
-                  <p className="text-sm font-bold text-indigo-600">
-                    {exp.company} <span className="text-slate-300 mx-2">•</span>{" "}
+                  <p className="text-sm font-bold text-primary">
+                    {exp.company} <span className="text-muted mx-2">•</span>{" "}
                     {exp.duration}
                   </p>
                 </div>
@@ -109,7 +109,7 @@ export const CvResultPreview = ({ data }: { data: any }) => {
                   {exp.descriptions.map((desc: string, idx: number) => (
                     <li
                       key={idx}
-                      className="text-sm text-slate-600 leading-relaxed"
+                      className="text-sm text-muted leading-relaxed"
                     >
                       {desc}
                     </li>
@@ -121,18 +121,18 @@ export const CvResultPreview = ({ data }: { data: any }) => {
         </div>
 
         {/* Education */}
-        <div className="bg-white p-8 rounded-4xl border border-slate-200 shadow-sm">
+        <div className="bg-card p-8 rounded-4xl border border-border-custom shadow-sm">
           <h4 className="text-lg font-bold mb-6 flex items-center gap-2">
-            <GraduationCap className="text-indigo-600" size={20} />
+            <GraduationCap className="text-primary" size={20} />
             Education
           </h4>
           <div className="space-y-6">
             {info.education?.map((edu: any, i: number) => (
               <div key={i}>
-                <h5 className="font-bold text-slate-800 text-sm">
+                <h5 className="font-bold text-foreground text-sm">
                   {edu.degree}
                 </h5>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted">
                   {edu.institution} • {edu.year}
                 </p>
               </div>
