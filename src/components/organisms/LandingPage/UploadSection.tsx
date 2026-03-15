@@ -5,7 +5,7 @@ export const UploadSection = () => {
   return (
     <section className="px-6 py-20 bg-background">
       <div className="max-w-5xl mx-auto">
-        <div className="relative group p-12 border-2 border-dashed border-primary/30 rounded-[40px] bg-white shadow-sm hover:border-primary/50 transition-all text-center space-y-6">
+        <div className="relative group p-12 border-2 border-dashed border-primary/30 rounded-[40px] shadow-sm hover:border-primary/50 transition-all text-center space-y-6">
           {/* Icon Upload */}
           <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary">
             <svg

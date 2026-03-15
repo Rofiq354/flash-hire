@@ -47,7 +47,7 @@ export const Hero = () => {
       {/* Right Content (Visual) */}
       <div className="relative flex justify-center items-center">
         {/* Container Visual pakai background primary super tipis atau bg-background */}
-        <div className="relative w-full aspect-square max-w-[500px] bg-primary/5 rounded-[40px] flex items-center justify-center overflow-hidden border border-primary/10">
+        <div className="relative w-full aspect-square max-w-125 bg-primary/5 rounded-[40px] flex items-center justify-center overflow-hidden border border-primary/10">
           {/* Lingkaran Putus-putus pakai border primary */}
           <div className="absolute w-[80%] h-[80%] border-2 border-dashed border-primary/20 rounded-full animate-[spin_30s_linear_infinite]" />
 

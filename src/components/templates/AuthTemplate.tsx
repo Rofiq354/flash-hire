@@ -14,12 +14,12 @@ export const AuthTemplate = ({
     className={`flex min-h-screen ${reverse ? "flex-row" : "flex-row-reverse"}`}
   >
     {/* Section Form */}
-    <div className="flex w-full items-center justify-center bg-white p-8 lg:w-1/2">
+    <div className="flex w-full items-center justify-center bg-background p-8 lg:w-1/2">
       <div className="w-full max-w-md">{formSection}</div>
     </div>
 
     {/* Section Info/Gambar */}
-    <div className="hidden w-1/2 flex-col justify-between bg-primary p-12 text-white lg:flex">
+    <div className="hidden w-1/2 flex-col justify-between bg-primary p-12 text-primary-foreground lg:flex">
       {infoSection}
     </div>
   </div>

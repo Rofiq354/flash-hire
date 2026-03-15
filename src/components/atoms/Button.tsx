@@ -47,7 +47,7 @@ export const Button = ({
 
   const variants = {
     primary:
-      "bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700",
+      "bg-primary text-white shadow-xl shadow-primary/20 hover:bg-primary/80",
     secondary: "bg-slate-800 text-white hover:bg-slate-900",
     outline:
       "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
@@ -105,12 +105,12 @@ export const LinkButton = ({
 
   const variants = {
     primary:
-      "bg-indigo-600 text-white shadow-lg shadow-indigo-100 hover:bg-indigo-700",
+      "bg-primary text-white shadow-xl shadow-primary/20 hover:bg-primary/80",
     secondary: "bg-slate-800 text-white hover:bg-slate-900",
     outline:
       "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
     ghost:
-      "bg-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-100",
+      "bg-transparent text-foreground hover:text-background hover:bg-slate-100",
   };
 
   const handleClick = (e: React.MouseEvent) => {

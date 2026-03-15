@@ -14,7 +14,7 @@ export const Navbar = ({ user }: NavbarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4 md:p-6">
-      <nav className="relative flex items-center justify-between w-full max-w-7xl px-6 py-3 md:px-8 md:py-4 bg-white/70 backdrop-blur-xl border border-white/20 shadow-sm rounded-2xl md:rounded-3xl">
+      <nav className="relative flex items-center justify-between w-full max-w-7xl px-6 py-3 md:px-8 md:py-4 bg-background/70 backdrop-blur-xl border border-white/10 shadow-sm rounded-2xl md:rounded-3xl">
         {/* Sisi Kiri: Logo */}
         <div className="flex items-center gap-3 shrink-0">
           <Logo />
@@ -24,11 +24,11 @@ export const Navbar = ({ user }: NavbarProps) => {
         <div className="hidden md:flex items-center gap-8">
           <a
             href="#how-it-works"
-            className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors"
+            className="text-sm font-medium text-foreground hover:text-foreground/80 transition-colors"
           >
             How it Works
           </a>
-          <div className="w-px h-6 bg-slate-200" />
+          <div className="w-px h-6 bg-foreground/40" />
 
           <div className="flex items-center gap-2">
             {user ? (

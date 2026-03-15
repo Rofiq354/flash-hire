@@ -16,18 +16,18 @@ export default function RegisterPage({
 }) {
   const formContent = (
     <div className="space-y-8">
-      <ErrorCleaner />;
+      <ErrorCleaner />
       <div>
-        <h2 className="text-3xl font-bold text-slate-900">Create Account</h2>
-        <p className="mt-2 text-slate-600">
+        <h2 className="text-3xl font-bold tracking-tight text-foreground">Create Account</h2>
+        <p className="mt-2 text-muted">
           Start your career journey with AI today.
         </p>
       </div>
       <AuthAlert error={searchParams.error} />
       <GoogleAuthButton mode="register" />
       <div className="relative flex items-center justify-center py-2">
-        <div className="w-full border-t border-slate-200"></div>
-        <span className="absolute bg-white px-4 text-xs font-medium uppercase text-slate-400">
+        <div className="w-full border-t border-muted/40"></div>
+        <span className="absolute bg-background px-4 text-xs font-medium uppercase text-muted">
           Or continue with email
         </span>
       </div>

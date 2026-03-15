@@ -19,10 +19,10 @@ export default function LoginPage({
     <div className="space-y-8">
       <ErrorCleaner />
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+        <h2 className="text-3xl font-bold tracking-tight text-foreground">
           Welcome Back
         </h2>
-        <p className="mt-2 text-slate-600">
+        <p className="mt-2 text-muted">
           Enter your credentials to access your AI-powered career dashboard.
         </p>
       </div>
@@ -38,8 +38,8 @@ export default function LoginPage({
       <GoogleAuthButton mode="login" />
 
       <div className="relative flex items-center justify-center py-2">
-        <div className="w-full border-t border-slate-200"></div>
-        <span className="absolute bg-white px-4 text-xs font-medium uppercase text-slate-400">
+        <div className="w-full border-t border-muted/40"></div>
+        <span className="absolute bg-background px-4 text-xs font-medium uppercase text-muted">
           Or continue with email
         </span>
       </div>

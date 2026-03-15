@@ -28,11 +28,11 @@ export default function GoogleAuthButton({ mode }: Props) {
       onClick={handleClick}
       disabled={isGoogleLoading}
       type="button"
-      className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 py-3 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100"
+      className="flex w-full items-center cursor-pointer justify-center gap-3 rounded-xl border border-muted/40 py-3 text-sm font-bold text-foreground/70 transition-all bg-background hover:bg-primary/10 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100"
     >
       {isGoogleLoading ? (
         <>
-          <Loader2 className="h-5 w-5 animate-spin text-indigo-600" />
+          <Loader2 className="h-5 w-5 animate-spin text-foreground" />
           <span>Connecting to Google...</span>
         </>
       ) : (
