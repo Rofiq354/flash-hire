@@ -215,49 +215,40 @@ export async function getCachedJob(jobId: string) {
   }
 }
 
-export async function getCachedScore(
+export async function getCachedAnalysis(
   userId: string,
   jobId: string,
-): Promise<number | null> {
+): Promise<any | null> {
   if (!redis) return null;
 
-  const key = `match_score:${userId}:${jobId}`;
+  const key = `job_analysis:${userId}:${jobId}`;
 
   try {
     const value = await redis.get(key);
     if (!value) return null;
 
-    const score = Number(value);
-
-    if (!Number.isInteger(score)) {
-      await redis.del(key);
-      return null;
-    }
-
-    return score;
+    return JSON.parse(value as string);
   } catch (error) {
-    console.error("❌ Redis get score failed:", error);
+    console.error("❌ Redis get analysis failed:", error);
     return null;
   }
 }
 
 // Fungsi untuk simpan banyak score sekaligus (Batch)
 
-export async function cacheScoresBatch(
+export async function cacheAnalysisBatch(
   userId: string,
-  scores: { id: string; score: number }[],
+  results: { id: string; analysis: any }[],
 ) {
-  if (!redis || scores.length === 0) return;
+  if (!redis || results.length === 0) return;
 
   const pipeline = redis.pipeline();
 
-  for (const { id, score } of scores) {
-    if (!Number.isInteger(score)) continue;
-
+  for (const { id, analysis } of results) {
     pipeline.setex(
-      `match_score:${userId}:${id}`,
-      60 * 60 * 24 * 7,
-      String(score),
+      `job_analysis:${userId}:${id}`,
+      60 * 60 * 24 * 7, // 7 hari
+      JSON.stringify(analysis),
     );
   }
 
@@ -295,24 +286,24 @@ export async function cacheJobsBatch(jobs: CachedJob[]) {
 // COMBINED: Get Job Details (Cache + Saved Jobs)
 // ============================================================================
 
-export async function getJobDetails(jobId: string, userId?: string) {
-  let job = await getCachedJob(jobId);
+// export async function getJobDetails(jobId: string, userId?: string) {
+//   let job = await getCachedJob(jobId);
 
-  if (!job) {
-    console.warn(`Job ${jobId} expired from cache`);
-    return null;
-  }
+//   if (!job) {
+//     console.warn(`Job ${jobId} expired from cache`);
+//     return null;
+//   }
 
-  // optional: inject latest score if user login
-  if (userId) {
-    const score = await getCachedScore(userId, jobId);
-    if (score !== null) {
-      job.matchScore = score;
-    }
-  }
+//   // optional: inject latest score if user login
+//   if (userId) {
+//     const score = await getCachedScore(userId, jobId);
+//     if (score !== null) {
+//       job.matchScore = score;
+//     }
+//   }
 
-  return job;
-}
+//   return job;
+// }
 
 // ============================================================================
 // Update Job Alert Last Sent
@@ -391,7 +382,7 @@ export const jobStorage = {
   getUserSavedJobs,
   isJobSavedByUser,
   removeSavedJob,
-  getJobDetails,
+  // getJobDetails,
 
   // Cache operations
   cacheJob,

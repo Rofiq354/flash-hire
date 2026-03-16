@@ -15,27 +15,29 @@ interface JobCardProps {
 }
 
 export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
+  // 1. Inisialisasi state langsung dari data yang sudah ada (server-side)
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<any | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<any | null>(
+    job.analysisResult || null, // Ambil data dari server jika ada
+  );
   const [showModal, setShowModal] = useState(false);
 
   const cleanTitle = job.title?.replace(/<\/?[^>]+(>|$)/g, "") || "Position";
-
   const matchScore = job.matchScore ?? null;
 
-  // Penentuan warna badge berdasarkan score
-  const getScoreStyles = (score: number) => {
-    if (score >= 75) return "bg-emerald-50 text-emerald-600 border-emerald-100";
-    if (score >= 50) return "bg-amber-50 text-amber-600 border-amber-100";
-    return "bg-red-50 text-red-600 border-red-100";
-  };
-
   const handleAnalyze = async () => {
+    // 2. LOGIK ZERO-LATENCY: Jika sudah ada data, langsung buka modal
+    if (analysisResult && !isAnalyzing) {
+      setShowModal(true);
+      return;
+    }
+
     if (!cvData || !userId) {
       alert("Please login and upload your CV first");
       return;
     }
 
+    // 3. FALLBACK: Hanya fetch jika data belum ada (misal cache expired)
     try {
       setIsAnalyzing(true);
       setShowModal(true);
@@ -51,23 +53,21 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
       });
 
       const result = await response.json();
-
       if (result.success) {
         setAnalysisResult(result.data);
-      } else {
-        throw new Error(result.error);
       }
     } catch (error) {
       console.error("Analysis failed:", error);
-      setAnalysisResult({
-        overall_score: 0,
-        strengths: ["Analysis failed"],
-        weaknesses: [],
-        overall_advice: "Unable to analyze this job at the moment.",
-      });
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  // Penentuan warna badge berdasarkan score
+  const getScoreStyles = (score: number) => {
+    if (score >= 75) return "bg-emerald-50 text-emerald-600 border-emerald-100";
+    if (score >= 50) return "bg-amber-50 text-amber-600 border-amber-100";
+    return "bg-red-50 text-red-600 border-red-100";
   };
 
   return (
@@ -110,19 +110,13 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
         </div>
 
         {matchScore !== null && (
-          <div className="mt-5 bg-muted/5 border border-border-custom rounded-2xl p-4 transition-all">
+          <div className="mt-5 bg-muted/5 border border-border-custom rounded-2xl p-4">
             <div className="flex items-center justify-between mb-2">
               <p className="text-[10px] font-black text-muted uppercase tracking-wider">
                 Quick Match
               </p>
               <span
-                className={`text-[10px] font-bold uppercase ${
-                  matchScore >= 75
-                    ? "text-emerald-600"
-                    : matchScore >= 50
-                      ? "text-amber-600"
-                      : "text-rose-600"
-                }`}
+                className={`text-[10px] font-bold uppercase ${matchScore >= 75 ? "text-emerald-600" : "text-amber-600"}`}
               >
                 {matchScore >= 75
                   ? "Strong"
@@ -134,23 +128,24 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
 
             {analysisResult ? (
               <div className="space-y-1.5">
-                <p className="text-sm font-semibold text-foreground">
-                  {analysisResult.strengths[0] || "Good match for this role"}
+                <p className="text-sm font-semibold text-foreground leading-tight">
+                  {/* Tampilkan skill yang cocok sebagai preview */}
+                  {analysisResult.matched_skills?.length > 0
+                    ? `Great match for ${analysisResult.matched_skills[0]}`
+                    : "Matches your profile"}
                 </p>
-                {analysisResult.missing_skills.critical?.length > 0 && (
+                {analysisResult.missing_skills?.length > 0 && (
                   <p className="text-xs text-muted">
                     Missing:{" "}
                     <span className="text-rose-600 font-medium">
-                      {analysisResult.missing_skills.critical
-                        .slice(0, 2)
-                        .join(", ")}
+                      {analysisResult.missing_skills.slice(0, 2).join(", ")}
                     </span>
                   </p>
                 )}
               </div>
             ) : (
               <p className="text-xs text-muted italic">
-                Click "Analyze" for detailed skill gap analysis
+                Analyzing match details...
               </p>
             )}
           </div>
@@ -160,11 +155,10 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
       {/* Action Buttons */}
       <div className="flex gap-3 mt-6">
         <LinkButton
-          href={`${job.url}`}
+          href={job.url}
           target="_blank"
           variant="primary"
           className="flex-1 rounded-xl py-2.5 text-sm font-bold"
-          showLoadingOnClick
         >
           View Details
         </LinkButton>
@@ -173,9 +167,9 @@ export const JobCard = ({ job, cvData, userId }: JobCardProps) => {
           className="flex-1 rounded-xl py-2.5 text-sm font-bold"
           onClick={handleAnalyze}
           isLoading={isAnalyzing}
-          disabled={!cvData || !userId}
         >
-          {analysisResult ? "Re-analyze" : "Analyze"}
+          {/* Text button jadi dinamis */}
+          {analysisResult ? "Full Analysis" : "Analyze"}
         </Button>
       </div>
 

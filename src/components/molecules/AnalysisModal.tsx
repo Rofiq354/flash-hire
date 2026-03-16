@@ -20,7 +20,19 @@ export const AnalysisModal = ({
   data,
   jobTitle,
 }: AnalysisModalProps) => {
-  if (!isOpen) return null;
+  const normalizedData = data
+    ? {
+        ...data,
+        overall_score: data.overall_score || data.score || 0,
+        // Jika data.missing_skills adalah array [A, B], bungkus jadi object {critical: [A, B]}
+        missing_skills: Array.isArray(data.missing_skills)
+          ? { critical: data.missing_skills, important: [], nice_to_have: [] }
+          : data.missing_skills,
+        matching_skills: Array.isArray(data.matched_skills)
+          ? { hard_skills: data.matched_skills, soft_skills: [], tools: [] }
+          : data.matching_skills,
+      }
+    : null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -52,7 +64,7 @@ export const AnalysisModal = ({
               </p>
             </div>
           ) : data ? (
-            <SkillGapDashboard analysis={data} />
+            <SkillGapDashboard analysis={normalizedData} />
           ) : (
             <div className="text-center py-20 text-gray-500">
               <p>No analysis data available</p>

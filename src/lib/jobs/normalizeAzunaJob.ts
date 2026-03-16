@@ -1,4 +1,5 @@
 // src/lib/jobs/normalizeAzunaJob.ts
+
 export interface NormalizedJob {
   id: string;
   title: string;
@@ -19,10 +20,10 @@ export interface NormalizedJob {
   url: string;
   source: "adzuna";
   matchScore?: number;
+  analysisResult?: any; 
 }
 
 export function normalizeAdzunaJob(job: any): NormalizedJob {
-  // Determine location type
   const title = job.title?.toLowerCase() || "";
   const desc = job.description?.toLowerCase() || "";
   let locationType: "remote" | "onsite" | "hybrid" = "onsite";
@@ -39,7 +40,7 @@ export function normalizeAdzunaJob(job: any): NormalizedJob {
   }
 
   return {
-    id: job.id,
+    id: String(job.id),
     title: job.title,
     company: job.company?.display_name || "Unknown Company",
     location: job.location?.display_name || "Not specified",

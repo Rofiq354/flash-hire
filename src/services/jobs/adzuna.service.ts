@@ -3,21 +3,14 @@
 // FINAL VERSION - Works with Your Existing Database Schema
 // ============================================================================
 
+import { normalizeAdzunaJob } from "@/lib/jobs/normalizeAzunaJob";
 import {
-  normalizeAdzunaJob,
-  NormalizedJob,
-} from "@/lib/jobs/normalizeAzunaJob";
-import {
+  cacheAnalysisBatch,
   cacheJob,
   cacheJobsBatch,
-  cacheScoresBatch,
-  getCachedScore,
+  getCachedAnalysis,
   jobCache,
 } from "@/lib/jobs/job-storage-adapted.service";
-import {
-  calculateJobMatches,
-  calculateMatchScore,
-} from "@/lib/jobs/matchScore";
 import { prisma } from "@/lib/prisma";
 import { calculateMVPMatchScore } from "@/lib/jobs/mvpMatcher";
 
@@ -203,48 +196,75 @@ export async function fetchAdzunaJobs(
       });
 
       if (userCV?.skills?.length) {
+        // 1. Map & Hitung Analysis (Cek Cache dulu, baru Hitung)
         const jobsWithScores = await Promise.all(
           normalizedJobs.map(async (job) => {
-            const cachedScore = await getCachedScore(userId, job.id);
+            // Cek apakah analisis lengkap sudah ada di Redis
+            const cachedAnalysis = await getCachedAnalysis(userId, job.id);
 
-            if (cachedScore !== null) {
-              return { ...job, matchScore: cachedScore };
+            if (cachedAnalysis) {
+              return {
+                ...job,
+                matchScore: cachedAnalysis.score,
+                analysisResult: cachedAnalysis,
+              };
             }
 
-            // Hitung score menggunakan MVP matcher
+            // Jika tidak ada di cache, hitung manual menggunakan Matcher
             const matchResult = await calculateMVPMatchScore(
               userId,
               job.id,
               job.title,
               job.description,
-              job.locationType,
+              job.locationType, // Sesuaikan parameter dengan fungsi matcher kamu
               isRemotePreference,
-              job.locationType,
-              // alert.is_remote, // Kirim preferensi dari database alert (boolean)
+              job.location,
             );
 
-            
-            return { ...job, matchScore: matchResult.score };
+            return {
+              ...job,
+              matchScore: matchResult.score,
+              analysisResult: matchResult,
+            };
           }),
         );
-        
+
+        // Update list utama dengan hasil scoring & analysis
         normalizedJobs = jobsWithScores;
-        // console.log(normalizedJobs)
 
-        const scoresToCache = jobsWithScores
-          .filter((job) => job.matchScore !== undefined)
-          .map((job) => ({ id: job.id, score: job.matchScore! }));
+        // 2. Simpan Analisis Lengkap ke Redis secara Batch
+        const analysisToCache = jobsWithScores.map((job) => ({
+          id: job.id,
+          analysis: job.analysisResult,
+        }));
 
-        if (scoresToCache.length > 0) {
-          await cacheScoresBatch(userId, scoresToCache);
+        if (analysisToCache.length > 0) {
+          // Fungsi baru yang kita bahas sebelumnya
+          await cacheAnalysisBatch(userId, analysisToCache);
         }
 
+        // 3. Simpan Detail Lowongan Umum ke Redis (Tanpa Skor)
+        // Supaya data job mentah bisa dipakai user lain tanpa hit API Adzuna lagi
         const jobsToCache = normalizedJobs.map(
-          ({ id, title, description, ...rest }) => ({
+          ({
             id,
             title,
             description,
-            ...rest,
+            company,
+            location,
+            locationType,
+            url,
+            postedDate,
+          }) => ({
+            id,
+            title,
+            description,
+            company,
+            location,
+            locationType,
+            url,
+            postedDate,
+            source: "adzuna",
           }),
         );
 

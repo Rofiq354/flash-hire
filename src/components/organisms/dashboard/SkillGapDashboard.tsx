@@ -43,6 +43,41 @@ export default function SkillGapDashboard({
     "overview" | "skills" | "recommendations"
   >("overview");
 
+  // NORMALISASI DATA: Pastikan semua properti ada meskipun backend hanya kirim data parsial
+  const safeAnalysis: SkillGapAnalysis = {
+    overall_score: analysis.overall_score ?? 0,
+    category_scores: analysis.category_scores ?? {
+      technical_skills: analysis.overall_score ?? 0,
+      experience: 0,
+      education: 0,
+      soft_skills: 0,
+    },
+    matching_skills: {
+      hard_skills:
+        analysis.matching_skills?.hard_skills ?? analysis.matching_skills ?? [], // Map matched_skills ke sini
+      soft_skills: analysis.matching_skills?.soft_skills ?? [],
+      tools: analysis.matching_skills?.tools ?? [],
+    },
+    missing_skills: {
+      critical:
+        analysis.missing_skills?.critical ?? analysis.missing_skills ?? [], // Map array simpel ke critical
+      important: analysis.missing_skills?.important ?? [],
+      nice_to_have: analysis.missing_skills?.nice_to_have ?? [],
+    },
+    recommendations: {
+      immediate_actions: analysis.recommendations?.immediate_actions ?? [],
+      short_term_learning: analysis.recommendations?.short_term_learning ?? [],
+      long_term_development:
+        analysis.recommendations?.long_term_development ?? [],
+    },
+    strengths: analysis.strengths ?? ["Good technical match"],
+    weaknesses: analysis.weaknesses ?? ["Standard requirements for this role"],
+    overall_advice:
+      analysis.overall_advice ??
+      "Keep refining your skills for this specific role.",
+    estimated_time_to_ready: analysis.estimated_time_to_ready,
+  };
+
   return (
     <div className="w-full space-y-6">
       {/* Overall Score Card */}
@@ -69,17 +104,17 @@ export default function SkillGapDashboard({
                 cx="64"
                 cy="64"
                 r="56"
-                stroke={getScoreColor(analysis.overall_score)}
+                stroke={getScoreColor(safeAnalysis.overall_score)}
                 strokeWidth="12"
                 fill="none"
                 strokeDasharray={`${2 * Math.PI * 56}`}
-                strokeDashoffset={`${2 * Math.PI * 56 * (1 - analysis.overall_score / 100)}`}
+                strokeDashoffset={`${2 * Math.PI * 56 * (1 - safeAnalysis.overall_score / 100)}`}
                 strokeLinecap="round"
               />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center flex-col">
               <span className="text-4xl font-bold text-primary">
-                {analysis.overall_score}
+                {safeAnalysis.overall_score}
               </span>
               <span className="text-sm text-gray-600">/ 100</span>
             </div>
@@ -88,7 +123,7 @@ export default function SkillGapDashboard({
 
         {/* Category Scores */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          {Object.entries(analysis.category_scores).map(([category, score]) => (
+          {Object.entries(safeAnalysis.category_scores).map(([category, score]) => (
             <div key={category} className="bg-white rounded-lg p-4 shadow-sm">
               <div className="text-xs text-gray-600 capitalize mb-2 font-medium">
                 {category.replace(/_/g, " ")}
@@ -113,11 +148,11 @@ export default function SkillGapDashboard({
         </div>
 
         {/* Estimated Time */}
-        {analysis.estimated_time_to_ready && (
+        {safeAnalysis.estimated_time_to_ready && (
           <div className="mt-4 p-3 bg-blue-100 rounded-lg border border-blue-200">
             <p className="text-sm font-medium text-blue-900">
               ⏱️ Estimated time to become competitive:{" "}
-              <strong>{analysis.estimated_time_to_ready}</strong>
+              <strong>{safeAnalysis.estimated_time_to_ready}</strong>
             </p>
           </div>
         )}
@@ -144,10 +179,10 @@ export default function SkillGapDashboard({
         </div>
 
         <div className="p-6">
-          {activeTab === "overview" && <OverviewTab analysis={analysis} />}
-          {activeTab === "skills" && <SkillsTab analysis={analysis} />}
+          {activeTab === "overview" && <OverviewTab analysis={safeAnalysis} />}
+          {activeTab === "skills" && <SkillsTab analysis={safeAnalysis} />}
           {activeTab === "recommendations" && (
-            <RecommendationsTab analysis={analysis} />
+            <RecommendationsTab analysis={safeAnalysis} />
           )}
         </div>
       </div>
