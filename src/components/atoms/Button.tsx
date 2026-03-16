@@ -1,4 +1,4 @@
-"use client"; // Pastikan ada ini karena pake useState
+"use client";
 
 import Link from "next/link";
 import React, { useState } from "react";

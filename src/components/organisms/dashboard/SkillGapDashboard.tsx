@@ -46,7 +46,7 @@ export default function SkillGapDashboard({
   return (
     <div className="w-full space-y-6">
       {/* Overall Score Card */}
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100">
+      <div className="bg-linear-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Match Score</h2>
@@ -78,7 +78,7 @@ export default function SkillGapDashboard({
               />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center flex-col">
-              <span className="text-4xl font-bold">
+              <span className="text-4xl font-bold text-primary">
                 {analysis.overall_score}
               </span>
               <span className="text-sm text-gray-600">/ 100</span>

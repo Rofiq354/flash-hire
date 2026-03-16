@@ -61,7 +61,7 @@ export default function OnboardingPage({
           required
         />
 
-        <SubmitButton className="w-full text-base shadow-indigo-100">
+        <SubmitButton className="w-full text-base shadow-primary/10">
           Finish & Go to Dashboard
         </SubmitButton>
       </form>

@@ -3,8 +3,7 @@
 import React, { useMemo } from "react";
 import { Button, LinkButton } from "@/components/atoms/Button";
 import { JobCard } from "@/components/molecules/JobCard";
-import { ChevronLeft, Search, Bell, ChevronDown } from "lucide-react";
-import { calculateMatchScore } from "@/lib/jobs/matchScore";
+import { ChevronLeft, Bell, ChevronDown } from "lucide-react";
 import SearchComponent from "@/components/molecules/job-matches/SearchComponent";
 
 export default function JobClient({
@@ -16,7 +15,16 @@ export default function JobClient({
   initialCv: any;
   userId?: string;
 }) {
-  const jobs = initialJobs;
+  const memoizedJobs = useMemo(() => {
+    return initialJobs.map((job) => (
+      <JobCard 
+        key={job.id} 
+        job={job} 
+        userId={userId} 
+        cvData={initialCv} 
+      />
+    ));
+  }, [initialJobs, userId, initialCv]);
 
   return (
     <div className="space-y-8">
@@ -39,7 +47,7 @@ export default function JobClient({
         <SearchComponent />
       </div>
 
-      {/* Alert Banner (Compact) */}
+      {/* Alert Banner */}
       <div className="bg-primary rounded-4xl p-6 text-primary-foreground flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-primary/20 relative overflow-hidden">
         <div className="flex items-center gap-4 text-center md:text-left relative z-10">
           <div className="h-12 w-12 bg-primary-foreground/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
@@ -60,15 +68,12 @@ export default function JobClient({
           Setup Job Alert
         </LinkButton>
 
-        {/* Decorative Background Element */}
         <div className="absolute -right-10 -top-10 w-40 h-40 bg-primary-foreground/5 rounded-full blur-3xl" />
       </div>
 
-      {/* Job Grid - 3 Columns on Large Screens */}
+      {/* Job Grid - Menggunakan hasil memoized */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {jobs.map((job) => (
-          <JobCard key={job.id} job={job} userId={userId} cvData={initialCv} />
-        ))}
+        {memoizedJobs}
       </div>
 
       {/* Pagination */}

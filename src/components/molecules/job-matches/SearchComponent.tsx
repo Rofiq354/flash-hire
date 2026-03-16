@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, X, Command, Loader2 } from "lucide-react";
+import { Search, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
 
 export default function SearchComponent() {
